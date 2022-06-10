@@ -33,7 +33,16 @@ const App = () => {
         <Stack.Screen
           name="HomeScreen"
           component={HomeScreen}
-          options={{ title: 'Welcome' }}
+          options={{ title: 'Welcome',
+          headerStyle: {
+            backgroundColor: 'blue',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+          
         />
         <Stack.Screen
           name="MainScreen"

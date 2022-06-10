@@ -69,6 +69,7 @@ const VideoScreen = () => {
         email: emailUser,
         url: url,
         likes: 0,
+        comments:[]
         // date: new Date().toDateString()
       })
       .then(() => {

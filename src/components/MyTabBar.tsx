@@ -9,7 +9,7 @@ export default function MyTabBar({ state, descriptors, navigation }:any) {
     const[activeItem, setActiveItem]=  useState('Home');
   
     return (
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: 'row' , height:50 }}>
         {state.routes.map((route:any, index:any) => {
           const { options } = descriptors[route.key];
           const label =
@@ -51,7 +51,7 @@ export default function MyTabBar({ state, descriptors, navigation }:any) {
               onPress={onPress}
               onLongPress={onLongPress}
               activeOpacity={0.8}
-              style={{ flex: 1 , backgroundColor:"rgba(0, 0, 0, 0.5)", height:50, alignItems:"center", justifyContent:"center"}}
+              style={{ flex: 1 , backgroundColor:"rgba(0, 0, 0, 0.5)",   alignItems:"center", justifyContent:"center"}}
             >
                   
               { label=="Home" && <FontAwesome5 name={"home"} color={activeItem==='Home'?"rgba(255, 255, 255,1)":"rgba(255, 255, 255 , 0.5)"} style={{textAlign:"center", fontSize:20}}/>}

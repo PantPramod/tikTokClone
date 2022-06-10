@@ -21,7 +21,7 @@ const Profile = () => {
       setData(filteredData)
     }
     getData();
-  },[])
+  })
 
   return (<>
     <View style={style.container}>

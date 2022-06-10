@@ -21,7 +21,8 @@ const SwipeableList = () => {
   const [commentText, setCommentText] = useState('');
   const [showComments, setShowComments] = useState(false);
   const [flag, setFlag] = useState(false);
-
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [ispaused, setIsPaused] = useState(false);
   useEffect(() => {
     const getData = async () => {
       const userData = await firestore().collection('UserData').get();
@@ -56,13 +57,27 @@ const SwipeableList = () => {
         setCommentText('');
       });
   }
+
+  console.log("current Index===>",currentIndex);
   return (<>
-    <ScrollView pagingEnabled={true} >
+    <ScrollView 
+    pagingEnabled={true} 
+    onScroll={(e:any)=>{
+     
+      let newPageNum:any = e.nativeEvent.contentOffset.y/(windowHeight-75);
+
+      console.log("page numbeer====>",parseInt( newPageNum))
+      setCurrentIndex((prev)=>parseInt( newPageNum));
+    }}
+  onScrollEndDrag={()=>{
+    setIsPaused(false)
+  }}
+    >
 
       {data &&
         data.map((item: any, i: number) =>
-          <View style={{ width: windowWidth, overflow: "hidden" }} key={item.id}>
-            <View style={{ position: "absolute", zIndex: 9999, top: 0, right: 0, left: 0, bottom: 0 }}>
+          <View style={{ width: windowWidth,height:windowHeight-50, overflow: "hidden" }} key={item.id}>
+            <View style={{ position: "absolute", top: 0, right: 0, left: 0, bottom: 0 }}>
               <View style={styles.avatar}>
                 <Text style={{ fontSize: 25, color: "white", textTransform: "uppercase" }}>{emailUser[0]}</Text>
               </View>
@@ -97,30 +112,27 @@ const SwipeableList = () => {
               </View>
 
               <View style={{ position: "absolute", bottom: 40, left: 10, zIndex: 999 }}>
-                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>@{emailUser.substring(0,emailUser.indexOf("@")) }</Text>
+                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>@{item._data.email.substring(0,item._data.email.indexOf("@")) }</Text>
               </View>
               <View style={{ position: "absolute", bottom: 10, left: 10, zIndex: 999 }}>
                 <Text style={{ color: "white", fontSize: 15 }}>#Title of the Video</Text>
               </View>
             </View>
-            <Image
-              style={{ width: windowWidth, height: windowHeight - 75, resizeMode: "cover" }}
-              source={{ uri: `https://source.unsplash.com/400x1000/?nature,water${i}` }}
-            />
-
-            {/* <Video
-              key={item._data.url}
-              muted={true}
-              source={{ uri: item._data.url }}
-              ref={vdoRef}
-              onBuffer={(e) => console.log("buffering....", e)}
-              onError={(e) => console.log(e)}
-              style={{ width: windowWidth, height: windowHeight - 75, borderWidth: 1 }}
-              resizeMode="cover"
-              paused={false}
-              playInBackground={false}
-              playWhenInactive={false}
-            /> */}
+           <TouchableOpacity 
+           onPress={()=>setIsPaused(!ispaused)}
+           activeOpacity={0.9}>
+             <Video
+                paused={i===currentIndex?false||ispaused:true}
+                // paused={true}
+                repeat={false}
+                source={{ uri: item._data.url }}
+                poster={ `https://source.unsplash.com/${windowWidth}x${windowHeight}/?nature,water${i}` }
+                resizeMode="cover"
+                style={{  width: windowWidth, height: windowHeight,  overflow: "hidden" }}
+                playInBackground={false}
+                playWhenInactive={false}
+              /> 
+         </TouchableOpacity>
             {showComments &&
               <View style={{ position: "absolute", zIndex: 9999, top: 0, right: 0, left: 0, backgroundColor: "rgba(0, 0, 0, 0.815)" }}>
                 <TouchableOpacity onPress={() =>setShowComments(false)} style={{ padding: 10 }}>
@@ -181,6 +193,7 @@ const styles = StyleSheet.create({
   }
   ,
   alignment: {
+    zIndex: 999,
     marginTop: 10,
     marginBottom: 10,
     marginRight: 10,
