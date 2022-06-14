@@ -1,112 +1,130 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Image, TouchableOpacity, Text, ScrollView, View, TextInput, Button, StyleSheet, Alert, ImageBackground, Dimensions } from 'react-native';
-import auth, { firebase } from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth';
 import { GlobalContext } from '../../App';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import SplashScreen from 'react-native-splash-screen'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  TouchableOpacity,
+  Text,
+  LogBox,
+  View,
+  TextInput,
+  StyleSheet,
+  Alert,
+  ImageBackground,
+  Dimensions
+} from 'react-native';
 
-const windowHeight= Dimensions.get('screen').height
+
+const windowHeight = Dimensions.get('screen').height
+
+LogBox.ignoreLogs([
+  "exported from 'deprecated-react-native-prop-types'.",
+])
 
 const HomeScreen = (props: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState('login');
-  const { emailUser, setEmailUser } = useContext(GlobalContext)
+  const { saveEmailUser } = useContext(GlobalContext)
 
 
-  const ClickHandler =async () => {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, [])
+
+  const ClickHandler = async () => {
 
     if (!email || !password) {
       Alert.alert("Entar valid email and password");
     }
     else {
       if (mode === "login") {
-        
-       await auth()
+
+        await auth()
           .signInWithEmailAndPassword(email, password)
           .then((data) => {
             console.log("data------->", data)
-            setEmailUser(email)
-          
-            // Alert.alert('SignIn Successfully');
+            saveEmailUser(email)
             props.navigation.navigate('MainScreen')
           })
           .catch((err) => {
-            // Alert.alert("Error")
             console.log("err code---->", err.code)
           })
       } else {
-       await auth()
+        await auth()
           .createUserWithEmailAndPassword(email, password)
           .then((data) => {
-            setEmailUser(email);
+            saveEmailUser(email);
             const update = {
               displayName: email,
             }
             auth().currentUser?.updateProfile(update)
-            Alert.alert('new user created')
-            console.log("data--->", data)
+
             props.navigation.navigate('MainScreen')
 
           })
           .catch(error => {
-            // Alert.alert("Error")
-            console.log(error)
+            console.log("error==>", error)
           });
       }
     }
+}
 
-    const currentuser= await auth().currentUser?.getIdTokenResult();
-    console.log('token:===> ', currentuser?.token);  
-  }
-
+const changeModeToRegister=()=>{
+  setMode("register"); 
+  setEmail(''); 
+  setPassword('');
+}
+const changeModeToLogin=()=>{
+  setMode("login"); 
+  setEmail(''); 
+  setPassword('');
+}
 
   return (
-    <View style={style.container}>
-     <ImageBackground 
-     style={style.container} 
-     source={{uri:"https://firebasestorage.googleapis.com/v0/b/tiktokclone-4cf36.appspot.com/o/images%2F358800.jpg?alt=media&token=e9e3f40e-39ba-4263-8498-374c06d147ed"}}>
-       
+    <View
+      style={style.container}>
+      <ImageBackground
+        style={style.container}
+        source={{ uri: "https://firebasestorage.googleapis.com/v0/b/tiktokclone-4cf36.appspot.com/o/images%2F358800.jpg?alt=media&token=e9e3f40e-39ba-4263-8498-374c06d147ed" }}>
+        {mode === 'login' ?
+          <Text style={style.header}>Login Form</Text> :
+          <Text style={style.header}>Registeration Form</Text>
+        }
 
-      {mode === 'login' ?
-        <Text style={style.header}>Login Form</Text> :
-        <Text style={style.header}>Registeration Form</Text>
-      }
+        <TextInput
+          placeholder="Enter Your Email"
+          onChangeText={newText => setEmail(newText)}
+          defaultValue={email}
+          style={style.input}
+        />
+        <TextInput
+          placeholder="Enter Your password"
+          style={style.input}
+          defaultValue={password}
+          onChangeText={newText => setPassword(newText)}
+          secureTextEntry={true}
+        />
 
-      <TextInput
-        placeholder="Enter Your Email"
-        onChangeText={newText => setEmail(newText)}
-        defaultValue={email}
-        style={style.input}
-      />
-      <TextInput
-        placeholder="Enter Your password"
-        style={style.input}
-        defaultValue={password}
-        onChangeText={newText => setPassword(newText)}
-        secureTextEntry={true}
-      />
-
-      <TouchableOpacity onPress={ClickHandler} style={style.btn} activeOpacity={0.8}>
-        {mode === "login" ?
-          <Text style={{fontSize:20, color:"white", textAlign:"center"}}>Login</Text> :
-          <Text style={{fontSize:20, color:"white", textAlign:"center"}}>Register</Text>}
-      </TouchableOpacity>
-
-      {mode === "login" &&
-        <TouchableOpacity
-          onPress={() => { setMode("register"); setEmail(''); setPassword('') }}
-        >
-          <Text style={style.info}>Click Here To Register</Text>
+        <TouchableOpacity onPress={ClickHandler} style={style.btn} activeOpacity={0.8}>
+          {mode === "login" ?
+            <Text style={style.btnText}>Login</Text> :
+            <Text style={style.btnText}>Register</Text>}
         </TouchableOpacity>
-      }
-      {mode === "register" &&
-        <TouchableOpacity
-          onPress={() => { setMode("login"); setEmail(''); setPassword('') }}
-        >
-          <Text style={style.info}>Already Registered Click Here To Login</Text>
-        </TouchableOpacity>
-      }
-</ImageBackground> 
+
+        {mode === "login" &&
+          <TouchableOpacity onPress={changeModeToRegister}>
+            <Text style={style.info}>Click Here To Register</Text>
+          </TouchableOpacity>
+        }
+
+        {mode === "register" &&
+          <TouchableOpacity onPress={changeModeToLogin}>
+            <Text style={style.info}>Already Registered </Text>
+          </TouchableOpacity>
+        }
+      </ImageBackground>
     </View>
   )
 }
@@ -137,16 +155,15 @@ const style = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // padding: 20,
     backgroundColor: "white",
     height: "100%",
-    bottom:windowHeight,
+    bottom: windowHeight,
     left: 0,
     right: 0,
-    top:0,
+    top: 0,
     position: "absolute",
-    resizeMode:"cover",
-    
+    resizeMode: "cover",
+
   },
 
   info: {
@@ -155,13 +172,18 @@ const style = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18
   },
-  btn:{
-    backgroundColor:"blue",
-    borderRadius:10,
+  btn: {
+    backgroundColor: "blue",
+    borderRadius: 10,
     padding: 10,
     width: "90%",
-    marginLeft:"auto",
-    marginRight:"auto"
+    marginLeft: "auto",
+    marginRight: "auto"
+  },
+  btnText: {
+    fontSize: 20,
+    color: "white",
+    textAlign: "center"
   }
 
 })

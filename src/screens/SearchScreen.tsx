@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { SafeAreaView, FlatList, Image, TouchableOpacity, Text, ScrollView, View, TextInput, Button, StyleSheet, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+// @ts-ignore
 import { DATA } from '../data/data';
 
 const windowWidth = Dimensions.get('window').width;
@@ -21,14 +22,24 @@ const SearchScreen = () => {
   }
   return (<>
     <SafeAreaView style={style.container}>
-      <View style={{ flexDirection: "row", alignItems: "center", padding: 0, marginTop: 10, marginBottom: 10, borderRadius: 10, borderWidth: 2, width: "90%", marginLeft: "auto", marginRight: "auto" }}>
-        <TextInput onChangeText={(text) => setSearchItem(text)} style={{ flex: 1, padding: 10, fontSize: 20 }} />
-
-        <TouchableOpacity onPress={search} style={{ padding: 10 }}>
-          <FontAwesome5Icon name="search" style={{ fontSize: 30 }} />
+      <View style={style.searchBox}>
+        <TextInput
+          onChangeText={(text) => setSearchItem(text)}
+          style={style.searchInput}
+        />
+        <TouchableOpacity
+          onPress={search}
+          style={{ padding: 10 }}
+        >
+          <FontAwesome5Icon
+            name="search"
+            style={{ fontSize: 30 }}
+          />
         </TouchableOpacity>
+
       </View>
       <FlatList
+        // @ts-ignore
         data={DATA}
         horizontal={false}
         numColumns={3}
@@ -95,5 +106,22 @@ const style = StyleSheet.create({
     right: 0,
     bottom: 0,
     overflow: 'hidden'
+  },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 0,
+    marginTop: 10,
+    marginBottom: 10,
+    borderRadius: 10,
+    borderWidth: 2,
+    width: "90%",
+    marginLeft: "auto",
+    marginRight: "auto"
+  },
+  searchInput: {
+    flex: 1,
+    padding: 10,
+    fontSize: 20
   }
 })

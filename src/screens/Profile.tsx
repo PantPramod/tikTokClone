@@ -16,15 +16,19 @@ const Profile = () => {
   useEffect(() => {
     const getData = async () => {
       const userData = await firestore().collection('UserData').get();
-      // console.log("userdata",userData.docs[0].ref.id)
       const filteredData = userData.docs.filter((item: any) => item._data.email === emailUser)
       setData(filteredData)
     }
     getData();
   })
 
+
+
+
   return (<>
     <View style={style.container}>
+
+      <Text style={{ fontSize: 20, color: "black", textAlign: "center", marginTop: 30 }}>Profile</Text>
       <View style={style.header}>
         <View style={style.avatar}>
           <ImageBackground
@@ -38,32 +42,40 @@ const Profile = () => {
             />
           </ImageBackground>
         </View>
-        <View style={style.nameandinfo}>
-          <Text style={style.name}>{emailUser}</Text>
-          <View style={style.info}>
-            <View style={style.follow}>
-              <Text style={style.white}>4</Text>
-              <Text style={style.white}>Followers</Text>
-            </View>
-            <View style={style.follow}>
-              <Text style={style.white}>10</Text>
-              <Text style={style.white}>Following</Text>
-            </View>
-            <View style={style.follow}>
-              <Text style={style.white}>10</Text>
-              <Text style={style.white}>Likes</Text>
-            </View>
-          </View>
+
+      </View>
+      <Text style={style.name}>{emailUser}</Text>
+
+      <View style={style.info}>
+        <View style={style.follow}>
+          <Text style={style.white}>4</Text>
+          <Text style={style.white}>Followers</Text>
+        </View>
+        <View style={style.follow}>
+          <Text style={style.white}>10</Text>
+          <Text style={style.white}>Following</Text>
+        </View>
+        <View style={style.follow}>
+          <Text style={style.white}>10</Text>
+          <Text style={style.white}>Likes</Text>
         </View>
       </View>
-      <Text style={{ color: "white", textAlign: "center", padding: 10, borderTopWidth: 1, borderColor: "white" }}>My Videos</Text>
-      <View style={{ }}>
-        {
-          data &&
-          <FlatList
-            data={data}
-            style={{paddingBottom:100, marginBottom:100}}
-            renderItem={({ item, index }) => (
+      <View>
+        <TouchableOpacity
+          style={style.editProfile}
+          onPress={() => { }}>
+          <Text style={style.editProfileText}>Edit Profile</Text>
+        </TouchableOpacity>
+      </View>
+
+      {
+        data &&
+        <FlatList
+          data={data}
+          numColumns={3}
+
+          renderItem={({ item, index }) => (
+            <View style={{ width: screenWidth / 3, height: 210, display: "flex", alignItems: 'center', justifyContent: 'center' }}>
               <VideoPlayer
                 key={item._data.url}
                 video={{ uri: item._data.url }}
@@ -71,11 +83,13 @@ const Profile = () => {
                 resizeMode="cover"
                 pauseOnPress={true}
                 customStyles={{ controls: false, seekBar: false }}
-                style={{ marginLeft: "auto", marginRight: "auto", width: screenWidth - 30, height: screenHeight - 250, borderRadius: 10, overflow: "hidden", marginBottom: 50, }}
-              />)}
-            keyExtractor={item => item._data.url}
-          />}
-      </View>
+                style={{ width: (screenWidth / 3) - 10, height: 200 }}
+              />
+            </View>
+          )}
+          keyExtractor={item => item._data.url}
+        />}
+
     </View>
 
   </>
@@ -90,14 +104,12 @@ export default Profile
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#000000e2"
+    flex: 1
   },
   header: {
-    flexDirection: "row",
+    display: "flex",
     alignItems: "center",
-    padding: 10,
-    alignSelf: "flex-start"
+    padding: 10
   },
 
   avatar: {
@@ -112,33 +124,52 @@ const style = StyleSheet.create({
   ico: {
     fontSize: 50,
   },
-  nameandinfo: {
-    paddingLeft: 10,
-    flex: 1,
 
-  },
   name: {
-    color: "white",
+    color: "black",
     fontSize: 20,
+    textAlign: "center"
 
   },
   white: {
-    color: "white"
+    color: "black",
+    textAlign: "center"
   },
   info: {
-
-    flex: 1,
-    justifyContent: "space-between",
+    marginTop: 10,
+    marginLeft: "auto",
+    marginRight: "auto",
+    justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    width: "100%"
+    width: "90%",
+    textAlign: "center"
+
   },
 
   follow: {
-
+    padding: 20,
+    paddingBottom: 0,
+    paddingTop: 0,
   },
   img: {
     height: screenHeight,
     width: screenWidth,
   },
+  editProfile: {
+    borderWidth: 1,
+    borderColor: "black",
+    padding: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: "auto",
+    marginRight: "auto",
+    borderRadius: 7,
+  },
+  editProfileText: {
+    color: "black",
+    textAlign: "center"
+  }
 })

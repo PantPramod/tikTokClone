@@ -1,6 +1,6 @@
 import { useIsFocused } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, Button, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Button, Dimensions, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
@@ -22,7 +22,7 @@ const VideoScreen = () => {
   const [showRecordedVideo, setShowRecordedVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState<any>({})
   const [loading, setLoading] = useState(false)
-
+  const [title, setTitle] = useState('');
   const camera = useRef<Camera>(null)
   const devices = useCameraDevices()
   const device = isBack ? devices.back : devices.front;
@@ -66,10 +66,11 @@ const VideoScreen = () => {
     firestore()
       .collection('UserData')
       .add({
+        title: title,
         email: emailUser,
         url: url,
-        likes: 0,
-        comments:[]
+        likes: [],
+        comments: []
         // date: new Date().toDateString()
       })
       .then(() => {
@@ -97,6 +98,7 @@ const VideoScreen = () => {
             video={true}
             audio={true}
             ref={camera}
+            zoom={1}
           />
           {!isrecording &&
             <View style={styles.cameraMode}>
@@ -118,37 +120,54 @@ const VideoScreen = () => {
       }
       {
         showRecordedVideo &&
-        <View style={{ backgroundColor: "black", flex: 1, justifyContent: "center" }}>
-          {!loading && <VideoPlayer
-            video={{ uri: videoUrl.path }}
-            videoWidth={windowWidth}
-            videoHeight={windowHeight - 220}
-            thumbnail={{ uri: 'https://source.unsplash.com/100x100/?nature,water1' }}
-            pauseOnPress={true}
-            autoplay={true}
-
-          />}
-          <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "space-evenly", width: "100%", position: "absolute", top: 10 }}>
-            <TouchableOpacity
+        <KeyboardAvoidingView style={{ backgroundColor: "black", flex: 1,  }}>
+          {!loading && <>
+         
+          <TouchableOpacity
               disabled={loading ? true : false}
               onPress={() => setShowRecordedVideo(false)}
-              style={{ right: 10, top: 10, position: "absolute" }}
+              style={{  }}
 
             >
-              <FontAwesome5Icon name="window-close" style={{ fontSize: 40, color: "white" }} />
+              <Ionicons name="close" style={{ fontSize: 40, color: "white", textAlign:"right",  }} />
             </TouchableOpacity>
-            <TouchableOpacity
+            <View style={{flexDirection:"row", alignItems:"center",padding:10, paddingBottom:20}}>
+            <TextInput placeholder='Enter Title for Video'
+              style={{
+                backgroundColor: "white",
+                width: "80%",
+                marginLeft: "auto",
+                marginRight: "auto",
+                borderRadius: 10,
+                
+              }}
+              value={title}
+              onChangeText={(text) => setTitle(text)}
+            />
+              <TouchableOpacity
               disabled={loading ? true : false}
               onPress={() => saveVideoToDataBase()}
-              style={{ left: 10, top: 10, position: "absolute" }}
+              style={{  }}
             >
               <FontAwesome5Icon name="save" style={{ fontSize: 40, color: "white" }} />
             </TouchableOpacity>
-          </View>
+            </View>
+          
+            <VideoPlayer
+              video={{ uri: videoUrl.path }}
+              // videoWidth={windowWidth}
+              // videoHeight={windowHeight - 220}
+              thumbnail={{ uri: 'https://source.unsplash.com/100x100/?nature,water1' }}
+              pauseOnPress={true}
+              autoplay={true}
+              style={{ width: windowWidth, height: 400 }}
+            />
 
-
+          </>
+          }
+          
           {loading && <ActivityIndicator size="large" color="white" />}
-        </View>
+        </KeyboardAvoidingView>
       }
     </>
   )
