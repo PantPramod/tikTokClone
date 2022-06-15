@@ -10,6 +10,7 @@ import VideoPlayer from 'react-native-video-player';
 import SoundPlayer from 'react-native-sound-player'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Sound from 'react-native-sound';
+import { createThumbnail } from "react-native-create-thumbnail";
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -27,7 +28,7 @@ const VideoScreen = () => {
   const devices = useCameraDevices()
   const device = isBack ? devices.back : devices.front;
   const isAppForeground = useIsFocused()
-  const { emailUser } = useContext(GlobalContext)
+  const { emailUser, dp } = useContext(GlobalContext)
 
 
   useEffect(() => {
@@ -62,16 +63,27 @@ const VideoScreen = () => {
     await reference.putFile(pathToFile);
     setLoading(true)
     const url = await storage().ref(`/videos/${num}`).getDownloadURL();
+    const thumbnailofVideo =await createThumbnail({
+      url: url,
+      timeStamp: 10000,
+    })
 
-    firestore()
+    const imageReference = storage().ref(`/images/${num}`);
+    const imagePathToFile = `${thumbnailofVideo.path}`;
+    await imageReference.putFile(imagePathToFile);
+    const urlImage = await storage().ref(`/images/${num}`).getDownloadURL();
+    console.log("thumbnailofVideo=====>", urlImage)
+    
+    await firestore()
       .collection('UserData')
       .add({
         title: title,
         email: emailUser,
         url: url,
         likes: [],
-        comments: []
-        // date: new Date().toDateString()
+        comments: [],
+        dp:dp,
+        thumbnail:urlImage        
       })
       .then(() => {
         console.log('User video Url added!');
@@ -79,9 +91,10 @@ const VideoScreen = () => {
       });
 
     console.log("Url====>", url)
-
+      
   }
 
+  
 
 
   if (device == null) return <View ><Text>Loading</Text></View>

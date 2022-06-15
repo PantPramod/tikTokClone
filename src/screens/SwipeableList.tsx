@@ -14,7 +14,10 @@ import {
   View,
   Dimensions,
   KeyboardAvoidingView,
-  Modal
+  Modal,
+  Share,
+  Alert,
+  Image
 } from 'react-native'
 
 
@@ -27,18 +30,13 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 
-const SwipeableList = () => {
+const SwipeableList = ({navigation}:any) => {
 
   const [data, setData] = useState<any>([])
-
   const [commentText, setCommentText] = useState('');
-
   const [showComments, setShowComments] = useState(false);
-
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const [ispaused, setIsPaused] = useState(false);
-
   const [flag, setFlag] = useState(false);
 
   const vdoRef = useRef(null)
@@ -107,6 +105,25 @@ const SwipeableList = () => {
 
   }
 
+  const onShare = async (url:string) => {
+    try {
+      const result = await Share.share({
+        message:url,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error:any) {
+      Alert.alert(error.message);
+    }
+  };
+
   return (<>
     <KeyboardAvoidingView>
       <ScrollView
@@ -117,12 +134,21 @@ const SwipeableList = () => {
       >
         {data &&
           data.map((item: any, i: number) =>
-            <View style={styles.mapWrapper} key={item.id}>
+            <View style={styles.mapWrapper} key={item._data.url}>
               <View style={styles.utills}>
-                <View style={styles.avatar}>
+                <TouchableOpacity 
+                style={styles.avatar}
+                onPress={()=>{navigation.navigate('UserProfile',{userEmail:item._data.email, userImage:item._data.dp})}}>
+              
+                  {item._data.dp &&
+                  <Image source={{uri:item._data.dp}}
+                  style={{zIndex:999, width:50, height:50, borderRadius:50}}
+                  />}
+                  {!item._data.dp &&
                   <Text style={[styles.avatarText, { fontSize: 25 }]}>{item._data.email[0]}</Text>
-                </View>
-
+                  }
+                 
+                  </TouchableOpacity>
                 <View style={styles.alignment}>
                   <TouchableOpacity onPress={() => { increaseLkes(item.ref.id, item._data.likes) }}>
                     {
@@ -150,7 +176,9 @@ const SwipeableList = () => {
                   <Text style={styles.center}>{item._data.comments.length}</Text>
                 </View>
                 <View style={styles.alignment}>
+                  <TouchableOpacity onPress={()=>onShare(item._data.url)}>
                   <FontAwesome5Icon name={"share"} color="white" style={{ fontSize: 40 }} />
+                  </TouchableOpacity>
                   <Text style={styles.center}>Share</Text>
                 </View>
                 <View style={styles.username}>
@@ -171,7 +199,7 @@ const SwipeableList = () => {
                     onError={(e) => console.log("Error......", e)}
                     repeat={true}
                     source={{ uri: item._data.url }}
-                    poster={`https://source.unsplash.com/500x800/?nature,water${i}`}
+                    poster={item._data.thumbnail}
                     resizeMode="cover"
                     posterResizeMode='cover'
                     style={{ width: windowWidth, height: windowHeight - 50, overflow: "hidden" }}
@@ -184,18 +212,19 @@ const SwipeableList = () => {
                   />
                 </TouchableOpacity>
               }
-              {showComments &&
+              {showComments && i===currentIndex &&
                 <Modal
                   animationType="slide"
                   transparent={true}
                   visible={showComments}
                   onRequestClose={() => {
-                    setShowComments(prev => !prev)
-                  }}
-                >
+                    
+                  }}>
                   <View style={styles.modalWrapper}>
                     <View style={styles.modal}>
-
+                      
+                      <View style={{ flexDirection:"row", alignItems:"center"}}>
+                       <Text style={{textAlign:"center", flex:1}}>{item._data.comments.length} Comments</Text>     
                       <TouchableOpacity
                         onPress={() => setShowComments(false)}
                         style={styles.closeWrapper}>
@@ -203,16 +232,25 @@ const SwipeableList = () => {
                           name="close"
                           style={styles.close} />
                       </TouchableOpacity>
-
-                      {item._data.comments.map((cmt: { user: string, text: string }, indx: number) =>
+                      </View>
+                      <ScrollView style={{maxHeight:windowHeight/1.8, overflow:"hidden",}}>  
+                      {item._data.comments.reverse().map((cmt: { user: string, text: string }, indx: number) =>
                         <View key={indx} style={styles.commentWrapper}>
-                          <View style={styles.avatar1}>
+                          
+                            <View style={styles.avatar1}>
+                            
                             <Text style={styles.avatarText}>{cmt.user[0]}</Text>
+                            
                           </View>
-                          <Text style={{ fontSize: 18, color: "#161722", }}>{cmt.text}</Text>
-                        </View>
+                          <View style={{ display:"flex", flex:1,width:"100%"}}>
+                            
+                          <Text style={{ fontSize: 18, color: "#161722",width:'100%' }}>{cmt.text}</Text>
+                          </View>
+                          
+                          
+                          </View>
                       )}
-
+                    </ScrollView>
                       <View style={styles.commentBox}>
                         <TextInput
                           onChangeText={(text) => setCommentText(text)}
@@ -348,9 +386,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    width: "90%",
+    width: "100%",
     marginLeft: "auto",
-    marginRight: "auto"
+    marginRight: "auto",
+    overflow: "hidden"
   },
   avatar1: {
     backgroundColor: "blue",
@@ -364,6 +403,7 @@ const styles = StyleSheet.create({
   avatarText: {
     color: "white",
     textTransform: 'uppercase'
+    
   },
   commentBox: {
     flexDirection: "row",

@@ -51,14 +51,17 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
             onPress={onPress}
             onLongPress={onLongPress}
             activeOpacity={0.8}
-            style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", alignItems: "center", justifyContent: "center" }}
+            style={{ flex: 1, backgroundColor: "rgb(0, 0, 0)", alignItems: "center", justifyContent: "center" }}
           >
 
             {
               label == "Home" &&
               <FontAwesome5
                 name={"home"}
-                color={activeItem === 'Home' ? "rgba(255, 255, 255,1)" : "rgba(255, 255, 255 , 0.5)"}
+                color={
+                  activeItem === 'Home' ?
+                    "rgba(255, 255, 255,1)" :
+                    "rgba(255, 255, 255 , 0.5)"}
                 style={{ textAlign: "center", fontSize: 20 }}
               />
             }
@@ -66,7 +69,11 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
               label == "Add" &&
               <FontAwesome5
                 name={"plus"}
-                color={activeItem === 'Add' ? "rgba(255, 255, 255,1)" : "rgba(255, 255, 255 , 0.5)"}
+                color={
+                  activeItem === 'Add' ?
+                    "rgba(255, 255, 255,1)" :
+                    "rgba(255, 255, 255 , 0.5)"
+                }
                 style={{
                   textAlign: "center",
                   fontSize: 20
@@ -77,7 +84,10 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
               label == "Search" &&
               <FontAwesome5
                 name={"search"}
-                color={activeItem === 'Search' ? "rgba(255, 255, 255,1)" : "rgba(255, 255, 255 , 0.5)"}
+                color={activeItem === 'Search' ?
+                  "rgba(255, 255, 255,1)" :
+                  "rgba(255, 255, 255 , 0.5)"
+                }
                 style={{ textAlign: "center", fontSize: 20 }}
               />
             }
@@ -85,7 +95,10 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
               label == "Profile" &&
               <FontAwesome5
                 name={"user"}
-                color={activeItem === 'Profile' ? "rgba(255, 255, 255,1)" : "rgba(255, 255, 255 , 0.5)"}
+                color={activeItem === 'Profile' ?
+                  "rgba(255, 255, 255,1)" :
+                  "rgba(255, 255, 255 , 0.5)"
+                }
                 style={{ textAlign: "center", fontSize: 20 }}
               />
             }

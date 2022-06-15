@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import { GlobalContext } from '../../App';
-import SplashScreen from 'react-native-splash-screen'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   TouchableOpacity,
@@ -26,12 +25,10 @@ const HomeScreen = (props: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState('login');
-  const { saveEmailUser } = useContext(GlobalContext)
+  const { saveEmailUser,  saveDp } = useContext(GlobalContext)
 
 
-  useEffect(() => {
-    SplashScreen.hide();
-  }, [])
+
 
   const ClickHandler = async () => {
 
@@ -44,8 +41,9 @@ const HomeScreen = (props: any) => {
         await auth()
           .signInWithEmailAndPassword(email, password)
           .then((data) => {
-            console.log("data------->", data)
+            console.log("data------->", data.user.photoURL)
             saveEmailUser(email)
+            saveDp(data.user.photoURL);
             props.navigation.navigate('MainScreen')
           })
           .catch((err) => {
@@ -92,7 +90,6 @@ const changeModeToLogin=()=>{
           <Text style={style.header}>Login Form</Text> :
           <Text style={style.header}>Registeration Form</Text>
         }
-
         <TextInput
           placeholder="Enter Your Email"
           onChangeText={newText => setEmail(newText)}
