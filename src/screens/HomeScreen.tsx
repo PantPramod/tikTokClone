@@ -2,9 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import { GlobalContext } from '../../App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import {
-  TouchableOpacity,
   Text,
   LogBox,
   View,
@@ -14,6 +12,7 @@ import {
   Dimensions
 } from 'react-native';
 import Input from '../components/Input';
+import Button from '../components/Button';
 
 
 const windowHeight = Dimensions.get('screen').height
@@ -39,14 +38,14 @@ const HomeScreen = (props: any) => {
 
         await auth()
           .signInWithEmailAndPassword(email, password)
-          .then((data) => {
-            console.log("data------->", data.user.photoURL)
+          .then(async(data) => {
+            
             saveEmailUser(email)
             saveDp(data.user.photoURL);
 
-            AsyncStorage.setItem('email', email)
-            AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
-            props.navigation.navigate('MainScreen')
+            await AsyncStorage.setItem('email', email)
+            await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
+            await props.navigation.navigate('MainScreen')
           })
           .catch((err) => {
             console.log("err code---->", err.code)
@@ -54,17 +53,16 @@ const HomeScreen = (props: any) => {
       } else {
         await auth()
           .createUserWithEmailAndPassword(email, password)
-          .then((data) => {
+          .then(async(data) => {
             saveEmailUser(email);
             const update = {
               displayName: email,
             }
             auth().currentUser?.updateProfile(update)
 
-            AsyncStorage.setItem('email', email)
-            AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
-
-            props.navigation.navigate('MainScreen')
+            await AsyncStorage.setItem('email', email)
+            await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
+            await props.navigation.navigate('MainScreen')
 
           })
           .catch(error => {
@@ -110,22 +108,23 @@ const HomeScreen = (props: any) => {
           secureTextEntry
         />
 
-        <TouchableOpacity onPress={ClickHandler} style={style.btn} activeOpacity={0.8}>
-          {mode === "login" ?
+        
+        <Button clickHandler={ClickHandler} style={style.btn}> 
+        {mode === "login" ?
             <Text style={style.btnText}>Login</Text> :
             <Text style={style.btnText}>Register</Text>}
-        </TouchableOpacity>
+        </Button>
 
         {mode === "login" &&
-          <TouchableOpacity onPress={changeModeToRegister}>
+          <Button clickHandler={changeModeToRegister}>
             <Text style={style.info}>Click Here To Register</Text>
-          </TouchableOpacity>
+          </Button>
         }
 
         {mode === "register" &&
-          <TouchableOpacity onPress={changeModeToLogin}>
+          <Button clickHandler={changeModeToLogin}>
             <Text style={style.info}>Already Registered </Text>
-          </TouchableOpacity>
+          </Button>
         }
       </ImageBackground>
     </View>

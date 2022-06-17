@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Image, TouchableOpacity, Text, View, ScrollView, StyleSheet, Dimensions, ImageBackground, Alert, Modal } from 'react-native';
+import { Image, TouchableOpacity, View, ScrollView, StyleSheet, Dimensions, ImageBackground, Alert, Modal } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { GlobalContext } from '../../App';
 import firestore from '@react-native-firebase/firestore';
@@ -9,6 +9,7 @@ import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/Icon';
+import TextComponent from '../components/TextComponent';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -21,6 +22,7 @@ const Profile = ({navigation}:any) => {
   const [emailUser, setEmailUser] = useState('');
   const [dp, setDp] = useState('')
   const {saveEmailUser} = useContext<any>(GlobalContext)
+ 
   useEffect(() => {
     const getEmail = async () => {
       try {
@@ -28,9 +30,11 @@ const Profile = ({navigation}:any) => {
         const dp = await AsyncStorage.getItem('dp')
         if (email !== null) {
           setEmailUser(email);
+          console.log("email===>",email)
         }
         if (dp !== null) {
           setDp(dp)
+          console.log("dp===>", dp)
         }
       } catch (e) {
         // error reading value
@@ -109,9 +113,12 @@ const Profile = ({navigation}:any) => {
   }
 
   const logoutHandler=async()=>{
-    saveEmailUser('')
+    
     const res= await AsyncStorage.clear(); 
-    await navigation.navigate('HomeScreen')
+    saveEmailUser('')
+    setEmailUser('');
+    setDp('');
+    await navigation.replace('HomeScreen')
 
     }
   return (<>
@@ -134,7 +141,7 @@ const Profile = ({navigation}:any) => {
         <TouchableOpacity
           onPress={() => saveToFireBaseStorage(image.uri)}
           style={{ backgroundColor: "blue", width: 200, marginTop: 30, padding: 10, borderRadius: 6, marginLeft: "auto", marginRight: "auto" }}>
-          <Text style={{ textAlign: "center", color: "white", fontSize: 20 }}>Upload</Text>
+          <TextComponent style={{ textAlign: "center", color: "white", fontSize: 20 }}>Upload</TextComponent>
         </TouchableOpacity>
         {uploadProgress > 0 && <View style={{ borderWidth: 1, width: "80%", height: 20, borderRadius: 5, marginLeft: 'auto', marginRight: "auto", marginTop: 10, }}>
           <View style={{ backgroundColor: "green", width: `${uploadProgress}%`, height: 20 }}>
@@ -143,7 +150,14 @@ const Profile = ({navigation}:any) => {
         </View>}
       </Modal>}
 
-      <Text style={{ fontSize: 20, color: "black", textAlign: "center", marginTop: 30 }}>Profile</Text>
+      
+      <TextComponent 
+        size='mediumLarge' 
+        color='black'
+        style={{ textAlign: "center", marginTop: 30 }}
+        >
+          Profile
+          </TextComponent>
       <TouchableOpacity
         style={{
           position: "absolute",
@@ -157,7 +171,7 @@ const Profile = ({navigation}:any) => {
         }}
         onPress={logoutHandler}
         >
-        <Text style={{ fontSize: 16 }}>Logout</Text>
+        <TextComponent style={{ fontSize: 16 }}>Logout</TextComponent>
       </TouchableOpacity>
       <View style={style.header}>
 
@@ -196,28 +210,28 @@ const Profile = ({navigation}:any) => {
 
 
       </View>
-      <Text style={style.name}>{emailUser}</Text>
+      <TextComponent style={style.name}>{emailUser}</TextComponent>
 
       <View style={style.info}>
         <View style={style.follow}>
-          <Text style={style.white}>4</Text>
-          <Text style={style.white}>Followers</Text>
+          <TextComponent style={style.white}>4</TextComponent>
+          <TextComponent style={style.white}>Followers</TextComponent>
         </View>
         <View style={style.follow}>
-          <Text style={style.white}>10</Text>
-          <Text style={style.white}>Following</Text>
+          <TextComponent style={style.white}>10</TextComponent>
+          <TextComponent style={style.white}>Following</TextComponent>
         </View>
         <View style={style.follow}>
-          <Text style={style.white}>10</Text>
-          <Text style=
-            {style.white}>Likes</Text>
+          <TextComponent style={style.white}>10</TextComponent>
+          <TextComponent style=
+            {style.white}>Likes</TextComponent>
         </View>
       </View>
       <View>
         <TouchableOpacity
           style={style.editProfile}
           onPress={() => { }}>
-          <Text style={style.editProfileText}>Edit Profile</Text>
+          <TextComponent style={style.editProfileText}>Edit Profile</TextComponent>
         </TouchableOpacity>
       </View>
       <View style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>

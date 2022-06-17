@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import firestore from '@react-native-firebase/firestore';
-import VideoPlayer from 'react-native-video-player';
 import TikTokScroller from './TikTokScroller';
+import Icon from './Icon';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -13,6 +12,7 @@ const UserProfile = ({ route, navigation }: any) => {
   const [data, setData] = useState<any>([])
   const [showVideos, setShowVideos] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  
   useEffect(() => {
     const getData = async () => {
       const userData = await firestore().collection('UserData').get();
@@ -28,7 +28,11 @@ const UserProfile = ({ route, navigation }: any) => {
     <>
     <View style={{borderBottomWidth:1, borderColor:"#d8d4d4", padding:10, backgroundColor:"white"}}>
         <TouchableOpacity onPress={()=>{navigation.navigate('MainScreen')}}>
-        <Ionicons name="arrow-back" style={{fontSize:25}}/>
+        <Icon 
+        source='Ionicons'
+        name="arrow-back"
+        style={{fontSize:25}}
+        />
         </TouchableOpacity>
       </View>
     <ScrollView style={styles.Container}>

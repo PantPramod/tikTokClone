@@ -1,25 +1,31 @@
 import firestore from '@react-native-firebase/firestore';
 import Video from 'react-native-video';
-import { GlobalContext } from '../../App';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+// import { GlobalContext } from '../../App';
+import React, {
+  // useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
-  TextInput,
+  // Text,
   TouchableOpacity,
   View,
   Dimensions,
   KeyboardAvoidingView,
   Modal,
   Share,
-  Alert,
-  Image
+  Alert
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/Icon';
 import Input from '../components/Input';
+import Avatar from '../components/Avatar';
+import Button from '../components/Button';
+import TextComponent from '../components/TextComponent';
 
 
 let statusBarHeight = 0
@@ -158,18 +164,13 @@ const SwipeableList = ({ navigation }: any) => {
             <View style={styles.mapWrapper} key={item._data.url}>
               <View style={styles.utills}>
 
-                <TouchableOpacity
-                  style={styles.avatar}
-                  onPress={() => { navigation.navigate('UserProfile', { userEmail: item._data.email, userImage: item._data.dp }) }}>
 
-                  {item._data.dp &&
-                    <Image source={{ uri: item._data.dp }}
-                      style={{ zIndex: 999, width: 50, height: 50, borderRadius: 50 }}
-                    />}
-                  {!item._data.dp &&
-                    <Text style={[styles.avatarText, { fontSize: 25 }]}>{item._data.email[0]}</Text>
-                  }
-                </TouchableOpacity>
+                <Avatar
+                  dp={item._data.dp}
+                  email={item._data.email}
+                  style={styles.avatar}
+                  clickHandler={() => { navigation.navigate('UserProfile', { userEmail: item._data.email, userImage: item._data.dp }) }}
+                />
 
                 <View style={{ width: 50, height: 50, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", marginLeft: "auto", marginRight: 10, marginTop: -45, }}>
 
@@ -184,7 +185,7 @@ const SwipeableList = ({ navigation }: any) => {
 
                 </View>
                 <View style={styles.alignment}>
-                  <TouchableOpacity onPress={() => { increaseLkes(item.ref.id, item._data.likes) }}>
+                  <Button clickHandler={() => { increaseLkes(item.ref.id, item._data.likes) }}>
                     <Icon
                       source='Ionicons'
                       name={
@@ -199,40 +200,43 @@ const SwipeableList = ({ navigation }: any) => {
                       }
                       style={{ fontSize: 40 }}
                     />
-                  </TouchableOpacity>
-                  <Text style={styles.center}>{item._data.likes.length}</Text>
+                  </Button>
+                  <TextComponent style={styles.center}>{item._data.likes.length}</TextComponent>
                 </View>
 
                 <View style={styles.alignment}>
-                  <TouchableOpacity onPress={() => setShowComments(true)}>
+                  <Button clickHandler={() => setShowComments(true)}>
                     <Icon
                       name="comment-dots"
                       source='FontAwesome5Icon'
                       color='white'
                       style={{ fontSize: 40 }}
                     />
-                  </TouchableOpacity>
-                  <Text style={styles.center}>{item._data.comments.length}</Text>
+                  </Button>
+                  <TextComponent style={styles.center}>{item._data.comments.length}</TextComponent>
                 </View>
 
                 <View style={styles.alignment}>
-                  <TouchableOpacity onPress={() => onShare(item._data.url)}>
+                  <Button clickHandler={() => onShare(item._data.url)}>
                     <Icon
                       source='FontAwesome5Icon'
                       name="share"
                       color='white'
                       style={{ fontSize: 40 }}
                     />
-                  </TouchableOpacity>
-                  <Text style={styles.center}>Share</Text>
+                  </Button>
+                  <TextComponent style={styles.center}>Share</TextComponent>
                 </View>
 
                 <View style={styles.username}>
-                  <Text style={styles.usernameText}>@{item._data.email.substring(0, item._data.email.indexOf("@"))}</Text>
+                  <TextComponent
+                    style={styles.usernameText}>
+                    {`@${item._data.email.substring(0, item._data.email.indexOf("@"))}`}
+                  </TextComponent>
                 </View>
 
                 <View style={styles.title}>
-                  <Text style={styles.titleText}>#{item._data.title}</Text>
+                  <TextComponent style={styles.titleText}>{`#${item._data.title}`}</TextComponent>
                 </View>
 
               </View>
@@ -272,42 +276,42 @@ const SwipeableList = ({ navigation }: any) => {
                     <View style={styles.modal}>
 
                       <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <Text style={{ textAlign: "center", flex: 1 }}>{item._data.comments.length} Comments</Text>
+                        <TextComponent style={{ textAlign: "center", flex: 1 }}>{`${item._data.comments.length} Comments`}</TextComponent>
 
-                        <TouchableOpacity
-                          onPress={() => setShowComments(false)}
+                        <Button
+                          clickHandler={() => setShowComments(false)}
                           style={styles.closeWrapper}>
                           <Icon
                             source='Ionicons'
                             name='close'
                             style={styles.close}
                           />
-                        </TouchableOpacity>
+                        </Button>
 
                       </View>
                       <ScrollView style={{ maxHeight: windowHeight / 1.8, overflow: "hidden", }}>
                         {item._data.comments.reverse().map((cmt: { user: string, text: string }, indx: number) =>
                           <View key={indx} style={styles.commentWrapper}>
                             <View style={styles.avatar1}>
-                              <Text style={styles.avatarText}>{cmt.user[0]}</Text>
+                              <TextComponent style={styles.avatarText}>{cmt.user[0]}</TextComponent>
                             </View>
                             <View style={{ display: "flex", flex: 1, width: "100%" }}>
-                              <Text style={{ fontSize: 18, color: "#161722", width: '100%' }}>{cmt.text}</Text>
+                              <TextComponent style={{ fontSize: 18, color: "#161722", width: '100%' }}>{cmt.text}</TextComponent>
                             </View>
                           </View>
                         )}
                       </ScrollView>
 
                       <View style={styles.commentBox}>
-                        
+
                         <Input
-                         placeholder='Enter Your Comment'
-                         style={styles.commentText}
-                         value={commentText}
-                         setValue={setCommentText}
-                         />
-                        <TouchableOpacity
-                          onPress={() => addComment(item.ref.id, item._data.comments)}
+                          placeholder='Enter Your Comment'
+                          style={styles.commentText}
+                          value={commentText}
+                          setValue={setCommentText}
+                        />
+                        <Button
+                          clickHandler={() => addComment(item.ref.id, item._data.comments)}
                           style={{ padding: 10 }}
                         >
                           <Icon
@@ -315,7 +319,7 @@ const SwipeableList = ({ navigation }: any) => {
                             name="send"
                             style={{ fontSize: 30 }}
                           />
-                        </TouchableOpacity>
+                        </Button>
                       </View>
                     </View>
                   </View>
