@@ -1,17 +1,14 @@
 import { useIsFocused } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, Button, Dimensions, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Dimensions, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import { GlobalContext } from '../../App';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import VideoPlayer from 'react-native-video-player';
-import SoundPlayer from 'react-native-sound-player'
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Sound from 'react-native-sound';
 import { createThumbnail } from "react-native-create-thumbnail";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from '../components/Icon';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -29,13 +26,13 @@ const VideoScreen = () => {
   const [dp, setDp] = useState('')
 
   const camera = useRef<Camera>(null)
-  
+
   const devices = useCameraDevices()
-  
+
   const device = isBack ? devices.back : devices.front;
-  
+
   const isAppForeground = useIsFocused()
-  
+
   // const {  dp } = useContext(GlobalContext)
 
 
@@ -49,13 +46,13 @@ const VideoScreen = () => {
       try {
         const email = await AsyncStorage.getItem('email')
         const dp = await AsyncStorage.getItem('dp')
-        if(email !== null) {
-               setEmailUser(email);
+        if (email !== null) {
+          setEmailUser(email);
         }
-        if(dp!==null){
+        if (dp !== null) {
           setDp(dp);
         }
-      } catch(e) {
+      } catch (e) {
         // error reading value
       }
     }
@@ -85,7 +82,7 @@ const VideoScreen = () => {
     await reference.putFile(pathToFile);
     setLoading(true)
     const url = await storage().ref(`/videos/${num}`).getDownloadURL();
-    const thumbnailofVideo =await createThumbnail({
+    const thumbnailofVideo = await createThumbnail({
       url: url,
       timeStamp: 10000,
     })
@@ -95,7 +92,7 @@ const VideoScreen = () => {
     await imageReference.putFile(imagePathToFile);
     const urlImage = await storage().ref(`/images/${num}`).getDownloadURL();
     console.log("thumbnailofVideo=====>", urlImage)
-    
+
     await firestore()
       .collection('UserData')
       .add({
@@ -104,8 +101,8 @@ const VideoScreen = () => {
         url: url,
         likes: [],
         comments: [],
-        dp:dp,
-        thumbnail:urlImage        
+        dp: dp,
+        thumbnail: urlImage
       })
       .then(() => {
         console.log('User video Url added!');
@@ -113,10 +110,10 @@ const VideoScreen = () => {
       });
 
     console.log("Url====>", url)
-      
+
   }
 
-  
+
 
 
   if (device == null) return <View ><Text>Loading</Text></View>
@@ -138,14 +135,19 @@ const VideoScreen = () => {
           {!isrecording &&
             <View style={styles.cameraMode}>
               <TouchableOpacity onPress={() => setIsBack(!isBack)}>
-                <FontAwesome5Icon name={"camera"} color={"rgba(255, 255, 255,1)"} style={{ textAlign: "center", fontSize: 25 }} />
+                <Icon
+                  source='FontAwesome5Icon'
+                  name="camera"
+                  color={"rgba(255, 255, 255,1)"}
+                  style={styles.frontback}
+                />
               </TouchableOpacity>
             </View>
           }
 
           <View style={styles.button}>
             {!isrecording ? <TouchableOpacity onPress={StartRecording} style={{ width: "100%" }}>
-              <Text style={{ textAlign: "center", color: "white", padding: 10 }}>Start</Text>
+              <Text style={styles.start}>Start</Text>
             </TouchableOpacity> :
               <TouchableOpacity onPress={stopRecording} style={{ width: "100%" }}>
                 <Text style={{ textAlign: "center", color: "red", padding: 10 }}>Stop</Text>
@@ -155,43 +157,35 @@ const VideoScreen = () => {
       }
       {
         showRecordedVideo &&
-        <KeyboardAvoidingView style={{ backgroundColor: "black", flex: 1,  }}>
+        <KeyboardAvoidingView style={{ backgroundColor: "black", flex: 1, }}>
           {!loading && <>
-         
-          <TouchableOpacity
-              disabled={loading ? true : false}
-              onPress={() => setShowRecordedVideo(false)}
-              style={{  }}
 
-            >
-              <Ionicons name="close" style={{ fontSize: 40, color: "white", textAlign:"right",  }} />
+            <TouchableOpacity disabled={loading ? true : false} onPress={() => setShowRecordedVideo(false)}>
+              <Icon
+                source='Ionicons'
+                name="close"
+                style={styles.close}
+              />
             </TouchableOpacity>
-            <View style={{flexDirection:"row", alignItems:"center",padding:10, paddingBottom:20}}>
-            <TextInput placeholder='Enter Title for Video'
-              style={{
-                backgroundColor: "white",
-                width: "80%",
-                marginLeft: "auto",
-                marginRight: "auto",
-                borderRadius: 10,
-                
-              }}
-              value={title}
-              onChangeText={(text) => setTitle(text)}
-            />
-              <TouchableOpacity
-              disabled={loading ? true : false}
-              onPress={() => saveVideoToDataBase()}
-              style={{  }}
-            >
-              <FontAwesome5Icon name="save" style={{ fontSize: 40, color: "white" }} />
-            </TouchableOpacity>
+
+            <View style={styles.box}>
+              <TextInput placeholder='Enter Title for Video'
+                style={styles.textInput}
+                value={title}
+                onChangeText={(text) => setTitle(text)}
+              />
+              <TouchableOpacity disabled={loading ? true : false} onPress={() => saveVideoToDataBase()}>
+                <Icon
+                  name='save'
+                  source='FontAwesome5Icon'
+                  style={{ fontSize: 40, color: "white" }}
+                />
+              </TouchableOpacity>
+
             </View>
-          
+
             <VideoPlayer
               video={{ uri: videoUrl.path }}
-              // videoWidth={windowWidth}
-              // videoHeight={windowHeight - 220}
               thumbnail={{ uri: 'https://source.unsplash.com/100x100/?nature,water1' }}
               pauseOnPress={true}
               autoplay={true}
@@ -200,7 +194,7 @@ const VideoScreen = () => {
 
           </>
           }
-          
+
           {loading && <ActivityIndicator size="large" color="white" />}
         </KeyboardAvoidingView>
       }
@@ -231,6 +225,33 @@ var styles = StyleSheet.create({
     right: 20,
     top: 20
   },
+  frontback: {
+    textAlign: "center",
+    fontSize: 25
+  },
+  start: {
+    textAlign: "center",
+    color: "white",
+    padding: 10
+  },
+  close: {
+    fontSize: 40,
+    color: "white",
+    textAlign: "right",
+  },
+  textInput: {
+    backgroundColor: "white",
+    width: "80%",
+    marginLeft: "auto",
+    marginRight: "auto",
+    borderRadius: 10,
 
+  },
+  box: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    paddingBottom: 20
+  }
 });
 

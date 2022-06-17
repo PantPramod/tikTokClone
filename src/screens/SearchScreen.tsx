@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { SafeAreaView, FlatList, Image, TouchableOpacity, Text, ScrollView, View, TextInput, Button, StyleSheet, Alert, Dimensions, ActivityIndicator } from 'react-native';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import Icon from '../components/Icon';
 // @ts-ignore
 import { DATA } from '../data/data';
 
@@ -31,10 +31,11 @@ const SearchScreen = () => {
           onPress={search}
           style={{ padding: 10 }}
         >
-          <FontAwesome5Icon
-            name="search"
-            style={{ fontSize: 30 }}
-          />
+          <Icon 
+          source='FontAwesome5Icon'
+          name="search" 
+          style={{ fontSize: 30 }}
+          /> 
         </TouchableOpacity>
 
       </View>
@@ -62,7 +63,13 @@ const SearchScreen = () => {
               onPress={() => { setShowModal(false); setImageSrc('') }}
               style={{ position: "absolute", zIndex: 999, right: 10, top: 10 }}
             >
-              <FontAwesome5Icon name="window-close" style={{ fontSize: 40, color: "white", textAlign: "right" }} />
+              
+              <Icon 
+              name="window-close"
+              source='FontAwesome5Icon'
+              style={{ fontSize: 40, color: "white", textAlign: "right" }}
+              />
+            
             </TouchableOpacity>
 
             <Image

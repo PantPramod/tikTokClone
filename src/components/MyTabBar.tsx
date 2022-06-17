@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-
-import { Image, TouchableOpacity, Text, ScrollView, View, TextInput, Button, StyleSheet } from 'react-native';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {  TouchableOpacity, View } from 'react-native';
+import Icon from './Icon';
 
 
 export default function MyTabBar({ state, descriptors, navigation }: any) {
@@ -56,7 +55,8 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
 
             {
               label == "Home" &&
-              <FontAwesome5
+              <Icon
+                source='FontAwesome5'
                 name={"home"}
                 color={
                   activeItem === 'Home' ?
@@ -67,7 +67,8 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
             }
             {
               label == "Add" &&
-              <FontAwesome5
+              <Icon
+                source='FontAwesome5'
                 name={"plus"}
                 color={
                   activeItem === 'Add' ?
@@ -82,7 +83,8 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
             }
             {
               label == "Search" &&
-              <FontAwesome5
+              <Icon
+                source='FontAwesome5'
                 name={"search"}
                 color={activeItem === 'Search' ?
                   "rgba(255, 255, 255,1)" :
@@ -93,7 +95,8 @@ export default function MyTabBar({ state, descriptors, navigation }: any) {
             }
             {
               label == "Profile" &&
-              <FontAwesome5
+              <Icon
+                source='FontAwesome5'
                 name={"user"}
                 color={activeItem === 'Profile' ?
                   "rgba(255, 255, 255,1)" :

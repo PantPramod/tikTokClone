@@ -4,11 +4,11 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { GlobalContext } from '../../App';
 import firestore from '@react-native-firebase/firestore';
 import VideoPlayer from 'react-native-video-player';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import {  launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from '../components/Icon';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -118,7 +118,12 @@ const Profile = ({navigation}:any) => {
     <ScrollView style={style.container}>
       {image && <Modal>
         <TouchableOpacity onPress={() => setImage(null)}>
-          <Ionicons name="close" style={{ fontSize: 30, textAlign: "right" }} />
+       
+          <Icon 
+          name='close' 
+          style={{ fontSize: 30, textAlign: "right" }} 
+          source="Ionicons" 
+          />
         </TouchableOpacity>
 
 
@@ -178,8 +183,13 @@ const Profile = ({navigation}:any) => {
             }}
             onPress={() => selectImage()}
           >
-            <Ionicons name="add" color="white" style={{ fontSize: 25 }} />
-
+            
+             <Icon 
+             source='Ionicons'
+             name="add"
+             style={{ fontSize: 25 }} 
+             color="white"
+             />
 
           </TouchableOpacity>
         </View>

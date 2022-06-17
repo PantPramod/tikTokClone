@@ -9,6 +9,7 @@ import UserProfile from './src/components/UserProfile';
 import AnimationTest from './src/components/AnimationTest';
 
 
+
 type GlobalType = {
   emailUser: string,
   saveEmailUser: any,

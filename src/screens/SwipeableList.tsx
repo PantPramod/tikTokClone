@@ -1,8 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
 import Video from 'react-native-video';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { GlobalContext } from '../../App';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   ScrollView,
@@ -20,6 +18,7 @@ import {
   Image
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from '../components/Icon';
 
 
 let statusBarHeight = 0
@@ -31,7 +30,7 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 
-const SwipeableList = ({navigation}:any) => {
+const SwipeableList = ({ navigation }: any) => {
 
   const [data, setData] = useState<any>([])
   const [commentText, setCommentText] = useState('');
@@ -41,29 +40,29 @@ const SwipeableList = ({navigation}:any) => {
   const [flag, setFlag] = useState(false);
   const [emailUser, setEmailUser] = useState('');
   const vdoRef = useRef(null)
- 
-  
+
+
   // const { emailUser} = useContext(GlobalContext)
 
-  
 
-useEffect(()=>{
-  const getEmail = async () => {
-    try {
-      const email = await AsyncStorage.getItem('email')
-      const dp = await AsyncStorage.getItem('dp')
-      if(email !== null) {
-  
-        setEmailUser(email);
-        // value previously stored
+
+  useEffect(() => {
+    const getEmail = async () => {
+      try {
+        const email = await AsyncStorage.getItem('email')
+        const dp = await AsyncStorage.getItem('dp')
+        if (email !== null) {
+
+          setEmailUser(email);
+          // value previously stored
+        }
+      } catch (e) {
+        // error reading value
       }
-    } catch(e) {
-      // error reading value
     }
-  }
-  getEmail();
-},[])
-   
+    getEmail();
+  }, [])
+
   useEffect(() => {
     const getData = async () => {
       const userData = await firestore().collection('UserData').get();
@@ -126,10 +125,10 @@ useEffect(()=>{
 
   }
 
-  const onShare = async (url:string) => {
+  const onShare = async (url: string) => {
     try {
       const result = await Share.share({
-        message:url,
+        message: url,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -140,7 +139,7 @@ useEffect(()=>{
       } else if (result.action === Share.dismissedAction) {
         // dismissed
       }
-    } catch (error:any) {
+    } catch (error: any) {
       Alert.alert(error.message);
     }
   };
@@ -157,63 +156,84 @@ useEffect(()=>{
           data.map((item: any, i: number) =>
             <View style={styles.mapWrapper} key={item._data.url}>
               <View style={styles.utills}>
-                <TouchableOpacity 
-                style={styles.avatar}
-                onPress={()=>{navigation.navigate('UserProfile',{userEmail:item._data.email, userImage:item._data.dp})}}>
-              
+
+                <TouchableOpacity
+                  style={styles.avatar}
+                  onPress={() => { navigation.navigate('UserProfile', { userEmail: item._data.email, userImage: item._data.dp }) }}>
+
                   {item._data.dp &&
-                  <Image source={{uri:item._data.dp}}
-                  style={{zIndex:999, width:50, height:50, borderRadius:50}}
-                  />}
+                    <Image source={{ uri: item._data.dp }}
+                      style={{ zIndex: 999, width: 50, height: 50, borderRadius: 50 }}
+                    />}
                   {!item._data.dp &&
-                  <Text style={[styles.avatarText, { fontSize: 25 }]}>{item._data.email[0]}</Text>
+                    <Text style={[styles.avatarText, { fontSize: 25 }]}>{item._data.email[0]}</Text>
                   }
-                 
-                 
+                </TouchableOpacity>
+
+                <View style={{ width: 50, height: 50, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", marginLeft: "auto", marginRight: 10, marginTop: -45, }}>
+
+                  <TouchableOpacity style={{ borderRadius: 50, backgroundColor: "#ea4359" }}>
+                    <Icon
+                      source='Ionicons'
+                      name="add"
+                      style={{ fontSize: 20, zIndex: 999 }}
+                      color="white"
+                    />
                   </TouchableOpacity>
-                  <View style={{width:50, height:50, zIndex:9999,  display:"flex", alignItems:"center", justifyContent:"center", marginLeft:"auto",marginRight:10,marginTop:-45,}}>
-                  <TouchableOpacity style={{ borderRadius:50, backgroundColor:"#ea4359"}}>
-                  <Ionicons name="add" style={{fontSize:20, zIndex:999}} color="white"/>
-                  </TouchableOpacity>
-                  </View>
+
+                </View>
                 <View style={styles.alignment}>
                   <TouchableOpacity onPress={() => { increaseLkes(item.ref.id, item._data.likes) }}>
-                    {
-                      item._data.likes.indexOf(emailUser) === -1 ?
-                        <Ionicons
-                          name="md-heart-outline"
-                          color="white"
-                          style={{ fontSize: 40 }} /> :
-                        <Ionicons
-                          name="heart"
-                          color="#dd4557"
-                          style={{ fontSize: 40 }} />
-                    }
+                    <Icon
+                      source='Ionicons'
+                      name={
+                        item._data.likes.indexOf(emailUser) === -1 ?
+                          "md-heart-outline" :
+                          "heart"
+                      }
+                      color={
+                        item._data.likes.indexOf(emailUser) === -1 ?
+                          "white" :
+                          "#dd4557"
+                      }
+                      style={{ fontSize: 40 }}
+                    />
                   </TouchableOpacity>
                   <Text style={styles.center}>{item._data.likes.length}</Text>
                 </View>
+
                 <View style={styles.alignment}>
                   <TouchableOpacity onPress={() => setShowComments(true)}>
-                    <FontAwesome5Icon
-                      name={"comment-dots"}
-                      color="white"
+                    <Icon
+                      name="comment-dots"
+                      source='FontAwesome5Icon'
+                      color='white'
                       style={{ fontSize: 40 }}
                     />
                   </TouchableOpacity>
                   <Text style={styles.center}>{item._data.comments.length}</Text>
                 </View>
+
                 <View style={styles.alignment}>
-                  <TouchableOpacity onPress={()=>onShare(item._data.url)}>
-                  <FontAwesome5Icon name={"share"} color="white" style={{ fontSize: 40 }} />
+                  <TouchableOpacity onPress={() => onShare(item._data.url)}>
+                    <Icon
+                      source='FontAwesome5Icon'
+                      name="share"
+                      color='white'
+                      style={{ fontSize: 40 }}
+                    />
                   </TouchableOpacity>
                   <Text style={styles.center}>Share</Text>
                 </View>
+
                 <View style={styles.username}>
                   <Text style={styles.usernameText}>@{item._data.email.substring(0, item._data.email.indexOf("@"))}</Text>
                 </View>
+
                 <View style={styles.title}>
                   <Text style={styles.titleText}>#{item._data.title}</Text>
                 </View>
+
               </View>
               {i === currentIndex &&
                 <TouchableOpacity
@@ -239,45 +259,44 @@ useEffect(()=>{
                   />
                 </TouchableOpacity>
               }
-              {showComments && i===currentIndex &&
+
+
+              {showComments && i === currentIndex &&
                 <Modal
                   animationType="slide"
                   transparent={true}
                   visible={showComments}
-                  onRequestClose={() => {
-                    
-                  }}>
+                >
                   <View style={styles.modalWrapper}>
                     <View style={styles.modal}>
-                      
-                      <View style={{ flexDirection:"row", alignItems:"center"}}>
-                       <Text style={{textAlign:"center", flex:1}}>{item._data.comments.length} Comments</Text>     
-                      <TouchableOpacity
-                        onPress={() => setShowComments(false)}
-                        style={styles.closeWrapper}>
-                        <Ionicons
-                          name="close"
-                          style={styles.close} />
-                      </TouchableOpacity>
+
+                      <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <Text style={{ textAlign: "center", flex: 1 }}>{item._data.comments.length} Comments</Text>
+
+                        <TouchableOpacity
+                          onPress={() => setShowComments(false)}
+                          style={styles.closeWrapper}>
+                          <Icon
+                            source='Ionicons'
+                            name='close'
+                            style={styles.close}
+                          />
+                        </TouchableOpacity>
+
                       </View>
-                      <ScrollView style={{maxHeight:windowHeight/1.8, overflow:"hidden",}}>  
-                      {item._data.comments.reverse().map((cmt: { user: string, text: string }, indx: number) =>
-                        <View key={indx} style={styles.commentWrapper}>
-                          
+                      <ScrollView style={{ maxHeight: windowHeight / 1.8, overflow: "hidden", }}>
+                        {item._data.comments.reverse().map((cmt: { user: string, text: string }, indx: number) =>
+                          <View key={indx} style={styles.commentWrapper}>
                             <View style={styles.avatar1}>
-                            
-                            <Text style={styles.avatarText}>{cmt.user[0]}</Text>
-                            
+                              <Text style={styles.avatarText}>{cmt.user[0]}</Text>
+                            </View>
+                            <View style={{ display: "flex", flex: 1, width: "100%" }}>
+                              <Text style={{ fontSize: 18, color: "#161722", width: '100%' }}>{cmt.text}</Text>
+                            </View>
                           </View>
-                          <View style={{ display:"flex", flex:1,width:"100%"}}>
-                            
-                          <Text style={{ fontSize: 18, color: "#161722",width:'100%' }}>{cmt.text}</Text>
-                          </View>
-                          
-                          
-                          </View>
-                      )}
-                    </ScrollView>
+                        )}
+                      </ScrollView>
+
                       <View style={styles.commentBox}>
                         <TextInput
                           onChangeText={(text) => setCommentText(text)}
@@ -288,7 +307,11 @@ useEffect(()=>{
                           onPress={() => addComment(item.ref.id, item._data.comments)}
                           style={{ padding: 10 }}
                         >
-                          <Ionicons name="send" style={{ fontSize: 30 }} />
+                          <Icon
+                            source='Ionicons'
+                            name="send"
+                            style={{ fontSize: 30 }}
+                          />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -430,7 +453,7 @@ const styles = StyleSheet.create({
   avatarText: {
     color: "white",
     textTransform: 'uppercase'
-    
+
   },
   commentBox: {
     flexDirection: "row",
