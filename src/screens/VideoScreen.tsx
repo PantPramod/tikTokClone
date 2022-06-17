@@ -1,6 +1,6 @@
 import { useIsFocused } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, Dimensions, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Dimensions, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
@@ -9,6 +9,7 @@ import VideoPlayer from 'react-native-video-player';
 import { createThumbnail } from "react-native-create-thumbnail";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/Icon';
+import Input from '../components/Input';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -169,10 +170,11 @@ const VideoScreen = () => {
             </TouchableOpacity>
 
             <View style={styles.box}>
-              <TextInput placeholder='Enter Title for Video'
+              
+              <Input placeholder='Enter Title for Video'
                 style={styles.textInput}
                 value={title}
-                onChangeText={(text) => setTitle(text)}
+                setValue={setTitle}
               />
               <TouchableOpacity disabled={loading ? true : false} onPress={() => saveVideoToDataBase()}>
                 <Icon

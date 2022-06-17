@@ -25,8 +25,8 @@ const Icon = ({ source, name, style, color }: propTypes) => {
 
     if (source === "FontAwesome5")
         return (<FontAwesome5 name={name} color={initColor} style={style} />)
-    
-        else return <></>
+
+    else return <></>
 }
 
 export default Icon

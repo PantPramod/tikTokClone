@@ -19,6 +19,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/Icon';
+import Input from '../components/Input';
 
 
 let statusBarHeight = 0
@@ -298,11 +299,13 @@ const SwipeableList = ({ navigation }: any) => {
                       </ScrollView>
 
                       <View style={styles.commentBox}>
-                        <TextInput
-                          onChangeText={(text) => setCommentText(text)}
-                          style={styles.commentText}
-                          value={commentText}
-                        />
+                        
+                        <Input
+                         placeholder='Enter Your Comment'
+                         style={styles.commentText}
+                         value={commentText}
+                         setValue={setCommentText}
+                         />
                         <TouchableOpacity
                           onPress={() => addComment(item.ref.id, item._data.comments)}
                           style={{ padding: 10 }}

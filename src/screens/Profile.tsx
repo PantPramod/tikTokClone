@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Image, TouchableOpacity, Text, View, ScrollView, TextInput, Button, StyleSheet, Dimensions, ImageBackground, InteractionManager, FlatList, Alert, Modal } from 'react-native';
+import { Image, TouchableOpacity, Text, View, ScrollView, StyleSheet, Dimensions, ImageBackground, Alert, Modal } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { GlobalContext } from '../../App';
 import firestore from '@react-native-firebase/firestore';

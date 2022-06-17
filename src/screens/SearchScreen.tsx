@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { SafeAreaView, FlatList, Image, TouchableOpacity, Text, ScrollView, View, TextInput, Button, StyleSheet, Alert, Dimensions, ActivityIndicator } from 'react-native';
+import { SafeAreaView, FlatList, Image, TouchableOpacity,  View, StyleSheet,  Dimensions} from 'react-native';
 import Icon from '../components/Icon';
+import Input from '../components/Input';
 // @ts-ignore
 import { DATA } from '../data/data';
 
@@ -23,10 +24,13 @@ const SearchScreen = () => {
   return (<>
     <SafeAreaView style={style.container}>
       <View style={style.searchBox}>
-        <TextInput
-          onChangeText={(text) => setSearchItem(text)}
-          style={style.searchInput}
-        />
+        
+        <Input 
+         value={searchItem} 
+         placeholder="Enter Image to Search"
+         setValue={setSearchItem} 
+         style={style.searchInput}
+         />
         <TouchableOpacity
           onPress={search}
           style={{ padding: 10 }}

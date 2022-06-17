@@ -8,12 +8,12 @@ import {
   Text,
   LogBox,
   View,
-  TextInput,
   StyleSheet,
   Alert,
   ImageBackground,
   Dimensions
 } from 'react-native';
+import Input from '../components/Input';
 
 
 const windowHeight = Dimensions.get('screen').height
@@ -23,16 +23,14 @@ LogBox.ignoreLogs([
 ])
 
 const HomeScreen = (props: any) => {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState('login');
-  const { saveEmailUser,  saveDp } = useContext(GlobalContext)
 
-
-
+  const { saveEmailUser, saveDp } = useContext(GlobalContext)
 
   const ClickHandler = async () => {
-
     if (!email || !password) {
       Alert.alert("Entar valid email and password");
     }
@@ -47,7 +45,7 @@ const HomeScreen = (props: any) => {
             saveDp(data.user.photoURL);
 
             AsyncStorage.setItem('email', email)
-            AsyncStorage.setItem('dp', data.user.photoURL?data.user.photoURL:'' )
+            AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
             props.navigation.navigate('MainScreen')
           })
           .catch((err) => {
@@ -64,7 +62,7 @@ const HomeScreen = (props: any) => {
             auth().currentUser?.updateProfile(update)
 
             AsyncStorage.setItem('email', email)
-            AsyncStorage.setItem('dp', data.user.photoURL?data.user.photoURL:'' )
+            AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
 
             props.navigation.navigate('MainScreen')
 
@@ -74,18 +72,18 @@ const HomeScreen = (props: any) => {
           });
       }
     }
-}
+  }
 
-const changeModeToRegister=()=>{
-  setMode("register"); 
-  setEmail(''); 
-  setPassword('');
-}
-const changeModeToLogin=()=>{
-  setMode("login"); 
-  setEmail(''); 
-  setPassword('');
-}
+  const changeModeToRegister = () => {
+    setMode("register");
+    setEmail('');
+    setPassword('');
+  }
+  const changeModeToLogin = () => {
+    setMode("login");
+    setEmail('');
+    setPassword('');
+  }
 
   return (
     <View
@@ -97,18 +95,19 @@ const changeModeToLogin=()=>{
           <Text style={style.header}>Login Form</Text> :
           <Text style={style.header}>Registeration Form</Text>
         }
-        <TextInput
-          placeholder="Enter Your Email"
-          onChangeText={newText => setEmail(newText)}
-          defaultValue={email}
+
+        <Input
+          placeholder='Enter Your Email'
+          setValue={setEmail}
+          value={email}
           style={style.input}
         />
-        <TextInput
+        <Input
           placeholder="Enter Your password"
           style={style.input}
-          defaultValue={password}
-          onChangeText={newText => setPassword(newText)}
-          secureTextEntry={true}
+          value={password}
+          setValue={setPassword}
+          secureTextEntry
         />
 
         <TouchableOpacity onPress={ClickHandler} style={style.btn} activeOpacity={0.8}>
