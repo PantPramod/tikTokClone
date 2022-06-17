@@ -11,6 +11,7 @@ import SoundPlayer from 'react-native-sound-player'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Sound from 'react-native-sound';
 import { createThumbnail } from "react-native-create-thumbnail";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -24,11 +25,18 @@ const VideoScreen = () => {
   const [videoUrl, setVideoUrl] = useState<any>({})
   const [loading, setLoading] = useState(false)
   const [title, setTitle] = useState('');
+  const [emailUser, setEmailUser] = useState('');
+  const [dp, setDp] = useState('')
+
   const camera = useRef<Camera>(null)
+  
   const devices = useCameraDevices()
+  
   const device = isBack ? devices.back : devices.front;
+  
   const isAppForeground = useIsFocused()
-  const { emailUser, dp } = useContext(GlobalContext)
+  
+  // const {  dp } = useContext(GlobalContext)
 
 
   useEffect(() => {
@@ -37,7 +45,21 @@ const VideoScreen = () => {
       await Camera.requestMicrophonePermission()
     }
     permission();
-
+    const getEmail = async () => {
+      try {
+        const email = await AsyncStorage.getItem('email')
+        const dp = await AsyncStorage.getItem('dp')
+        if(email !== null) {
+               setEmailUser(email);
+        }
+        if(dp!==null){
+          setDp(dp);
+        }
+      } catch(e) {
+        // error reading value
+      }
+    }
+    getEmail();
   }, [])
 
   const StartRecording = () => {

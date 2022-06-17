@@ -19,6 +19,7 @@ import {
   Alert,
   Image
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 let statusBarHeight = 0
@@ -38,11 +39,31 @@ const SwipeableList = ({navigation}:any) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ispaused, setIsPaused] = useState(false);
   const [flag, setFlag] = useState(false);
-
+  const [emailUser, setEmailUser] = useState('');
   const vdoRef = useRef(null)
+ 
+  
+  // const { emailUser} = useContext(GlobalContext)
 
-  const { emailUser } = useContext(GlobalContext)
+  
 
+useEffect(()=>{
+  const getEmail = async () => {
+    try {
+      const email = await AsyncStorage.getItem('email')
+      const dp = await AsyncStorage.getItem('dp')
+      if(email !== null) {
+  
+        setEmailUser(email);
+        // value previously stored
+      }
+    } catch(e) {
+      // error reading value
+    }
+  }
+  getEmail();
+},[])
+   
   useEffect(() => {
     const getData = async () => {
       const userData = await firestore().collection('UserData').get();
@@ -148,7 +169,13 @@ const SwipeableList = ({navigation}:any) => {
                   <Text style={[styles.avatarText, { fontSize: 25 }]}>{item._data.email[0]}</Text>
                   }
                  
+                 
                   </TouchableOpacity>
+                  <View style={{width:50, height:50, zIndex:9999,  display:"flex", alignItems:"center", justifyContent:"center", marginLeft:"auto",marginRight:10,marginTop:-45,}}>
+                  <TouchableOpacity style={{ borderRadius:50, backgroundColor:"#ea4359"}}>
+                  <Ionicons name="add" style={{fontSize:20, zIndex:999}} color="white"/>
+                  </TouchableOpacity>
+                  </View>
                 <View style={styles.alignment}>
                   <TouchableOpacity onPress={() => { increaseLkes(item.ref.id, item._data.likes) }}>
                     {
@@ -159,7 +186,7 @@ const SwipeableList = ({navigation}:any) => {
                           style={{ fontSize: 40 }} /> :
                         <Ionicons
                           name="heart"
-                          color="red"
+                          color="#dd4557"
                           style={{ fontSize: 40 }} />
                     }
                   </TouchableOpacity>

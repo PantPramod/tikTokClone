@@ -14,7 +14,7 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 
-const TikTokScroller = ({data, currentPage}: any) => {
+const TikTokScroller = ({data, currentPage, clickHandler}: any) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     
     
@@ -22,21 +22,26 @@ const TikTokScroller = ({data, currentPage}: any) => {
     const scrollHandler = (e: any) => {
         setCurrentIndex(parseInt( ((e.nativeEvent.contentOffset.y/(windowHeight-60-statusBarHeight)).toString())))
     }
+    
     return (
         <ScrollView
             pagingEnabled={true}
             onScroll={(e)=>scrollHandler(e)}
-            
-        >
+          >
             {data &&
                 data.map((item: any, i: number) =>
                 <View style={styles.mapWrapper} key={item._data.url}>
                    
                     <View style={styles.utills}>
+                      <View>
+                      <TouchableOpacity onPress={()=>{clickHandler()}} style={{zIndex:999, top:10, left:10}}>
+                            <Ionicons name="arrow-back" color={"white"} style={{fontSize:25}}/>
+                      </TouchableOpacity>
+                      </View>
                 <TouchableOpacity 
                 style={styles.avatar}
-                onPress={()=>{}}>
-              
+                onPress={()=>{clickHandler()}}>
+                 
                   {item._data.dp &&
                   <Image source={{uri:item._data.dp}}
                   style={{zIndex:999, width:50, height:50, borderRadius:50}}
@@ -44,28 +49,8 @@ const TikTokScroller = ({data, currentPage}: any) => {
                   {!item._data.dp &&
                   <Text style={[styles.avatarText, { fontSize: 25 }]}>{item._data.email[0]}</Text>
                   }
-                 
-                  </TouchableOpacity>
-                <View style={styles.alignment}>
-                  
-                  <Text style={styles.center}>{item._data.likes.length}</Text>
-                </View>
-                <View style={styles.alignment}>
-                  <TouchableOpacity onPress={() => {}}>
-                    <FontAwesome5Icon
-                      name={"comment-dots"}
-                      color="white"
-                      style={{ fontSize: 40 }}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.center}>{item._data.comments.length}</Text>
-                </View>
-                <View style={styles.alignment}>
-                  <TouchableOpacity onPress={()=>{}}>
-                  <FontAwesome5Icon name={"share"} color="white" style={{ fontSize: 40 }} />
-                  </TouchableOpacity>
-                  <Text style={styles.center}>Share</Text>
-                </View>
+                </TouchableOpacity>
+                
                 <View style={styles.username}>
                   <Text style={styles.usernameText}>@{item._data.email.substring(0, item._data.email.indexOf("@"))}</Text>
                 </View>
@@ -82,7 +67,7 @@ const TikTokScroller = ({data, currentPage}: any) => {
                         poster={item._data.thumbnail}
                         resizeMode="cover"
                         posterResizeMode='cover'
-                        style={{ width: windowWidth, height: windowHeight-50, overflow: "hidden" }}
+                        style={{ width: windowWidth, height: windowHeight, overflow: "hidden" }}
                         playInBackground={false}
                         playWhenInactive={false}
                         selectedVideoTrack={{
@@ -165,7 +150,7 @@ const styles = StyleSheet.create({
     },
     mapWrapper: {
       width: windowWidth,
-      height: windowHeight - 50 - statusBarHeight,
+      height: windowHeight  - statusBarHeight,
       overflow: "hidden"
     },
     utills: {
@@ -224,7 +209,6 @@ const styles = StyleSheet.create({
     avatarText: {
       color: "white",
       textTransform: 'uppercase'
-      
     },
     commentBox: {
       flexDirection: "row",

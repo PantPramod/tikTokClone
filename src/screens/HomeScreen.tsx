@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import { GlobalContext } from '../../App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {
   TouchableOpacity,
   Text,
@@ -44,6 +45,9 @@ const HomeScreen = (props: any) => {
             console.log("data------->", data.user.photoURL)
             saveEmailUser(email)
             saveDp(data.user.photoURL);
+
+            AsyncStorage.setItem('email', email)
+            AsyncStorage.setItem('dp', data.user.photoURL?data.user.photoURL:'' )
             props.navigation.navigate('MainScreen')
           })
           .catch((err) => {
@@ -58,6 +62,9 @@ const HomeScreen = (props: any) => {
               displayName: email,
             }
             auth().currentUser?.updateProfile(update)
+
+            AsyncStorage.setItem('email', email)
+            AsyncStorage.setItem('dp', data.user.photoURL?data.user.photoURL:'' )
 
             props.navigation.navigate('MainScreen')
 

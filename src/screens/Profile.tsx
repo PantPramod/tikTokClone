@@ -5,18 +5,42 @@ import { GlobalContext } from '../../App';
 import firestore from '@react-native-firebase/firestore';
 import VideoPlayer from 'react-native-video-player';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-const Profile = () => {
+const Profile = ({navigation}:any) => {
   const [data, setData] = useState<any>([])
-  const { emailUser, dp, saveDp } = useContext(GlobalContext);
+  const { saveDp } = useContext(GlobalContext);
   const [image, setImage] = useState<any>(null)
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [emailUser, setEmailUser] = useState('');
+  const [dp, setDp] = useState('')
+  const {saveEmailUser} = useContext<any>(GlobalContext)
+  useEffect(() => {
+    const getEmail = async () => {
+      try {
+        const email = await AsyncStorage.getItem('email')
+        const dp = await AsyncStorage.getItem('dp')
+        if (email !== null) {
+          setEmailUser(email);
+        }
+        if (dp !== null) {
+          setDp(dp)
+        }
+      } catch (e) {
+        // error reading value
+      }
+    }
+    getEmail();
+  }, [])
+
+
+
 
   useEffect(() => {
     const getData = async () => {
@@ -27,89 +51,115 @@ const Profile = () => {
     getData();
   })
 
-const selectImage=async()=>{
-  let options:any = {
-    storageOptions: {
-      skipBackup: true,
-      path: 'images',
-    },
-  };
+  const selectImage = async () => {
+    let options: any = {
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
 
-  launchImageLibrary(options, (res:any) => {
-    console.log('Response = ', res);
-    if (res.didCancel) {
-      console.log('User cancelled image picker');
-    } else if (res.error) {
-      console.log('ImagePicker Error: ', res.error);
-    } else if (res.customButton) {
-      console.log('User tapped custom button: ', res.customButton);
-      Alert.alert(res.customButton);
-    } else {
-      const source = { uri: res.uri };
-      console.log('response====>', res.assets[0]);
-      setImage(res.assets[0]);
+    launchImageLibrary(options, (res: any) => {
+      console.log('Response = ', res);
+      if (res.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (res.error) {
+        console.log('ImagePicker Error: ', res.error);
+      } else if (res.customButton) {
+        console.log('User tapped custom button: ', res.customButton);
+        Alert.alert(res.customButton);
+      } else {
+        const source = { uri: res.uri };
+        console.log('response====>', res.assets[0]);
+        setImage(res.assets[0]);
+      }
+    });
+  }
+
+  const saveToFireBaseStorage = async (i: any) => {
+    const num = new Date().toISOString();
+    const reference = storage().ref(`/images/${num}`);
+    const pathToFile = `${i}`;
+    const task = reference.putFile(pathToFile);
+
+    task.on('state_changed', taskSnapshot => {
+      console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+      setUploadProgress((taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100)
+    });
+
+    task.then(async () => {
+      console.log('Image uploaded to the bucket!');
+      const url = await storage().ref(`/images/${num}`).getDownloadURL();
+      if (url) {
+        const update = {
+          photoURL: url,
+        };
+        await auth().currentUser?.updateProfile(update)
+        setImage(null);
+      }
+      console.log("url====>", url)
+      saveDp(url);
+      try {
+        await AsyncStorage.setItem('dp', url)
+        setDp(url);
+      } catch (e) {
+        // saving error
+      }
+    });
+  }
+
+  const logoutHandler=async()=>{
+    saveEmailUser('')
+    const res= await AsyncStorage.clear(); 
+    await navigation.navigate('HomeScreen')
+
     }
-  });
-}
-
-const saveToFireBaseStorage=async(i:any)=>{
-  const num = new Date().toISOString();
-  const reference = storage().ref(`/images/${num}`);
-  const pathToFile = `${i}`;
-  const task= reference.putFile(pathToFile);
-
-  task.on('state_changed', taskSnapshot => {
-    console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
-    setUploadProgress((taskSnapshot.bytesTransferred/taskSnapshot.totalBytes)*100)
-  });
-  
-  task.then(async() => {
-    console.log('Image uploaded to the bucket!');
-    const url = await storage().ref(`/images/${num}`).getDownloadURL();
-    if(url){
-      const update = {
-        photoURL: url,
-      };
-     await auth().currentUser?.updateProfile(update)
-     setImage(null);
-    }
-    console.log("url====>",url)
-    saveDp(url);
-  });
- 
-
-}
   return (<>
     <ScrollView style={style.container}>
       {image && <Modal>
-          <TouchableOpacity onPress={()=>setImage(null)}>
-            <Ionicons name="close" style={{fontSize:30, textAlign:"right"}}/>
-          </TouchableOpacity>
-          
-        
+        <TouchableOpacity onPress={() => setImage(null)}>
+          <Ionicons name="close" style={{ fontSize: 30, textAlign: "right" }} />
+        </TouchableOpacity>
+
+
         <Image
-         source={{uri:image.uri}}
-         style={{width:300, height:300,marginLeft:"auto", marginRight:"auto"}}
+          source={{ uri: image.uri }}
+          style={{ width: 300, height: 300, marginLeft: "auto", marginRight: "auto" }}
         />
         <TouchableOpacity
-        onPress={()=>saveToFireBaseStorage(image.uri)} 
-        style={{backgroundColor:"blue", width:200,marginTop:30,padding:10,borderRadius:6, marginLeft:"auto", marginRight:"auto"}}>
-          <Text style={{textAlign:"center", color:"white", fontSize:20}}>Upload</Text>
+          onPress={() => saveToFireBaseStorage(image.uri)}
+          style={{ backgroundColor: "blue", width: 200, marginTop: 30, padding: 10, borderRadius: 6, marginLeft: "auto", marginRight: "auto" }}>
+          <Text style={{ textAlign: "center", color: "white", fontSize: 20 }}>Upload</Text>
         </TouchableOpacity>
-       {uploadProgress>0 && <View style={{borderWidth:1, width:"80%", height:20,borderRadius:5, marginLeft:'auto', marginRight:"auto", marginTop:10,  }}>
-             <View style={{backgroundColor:"green", width:`${uploadProgress}%`, height:20}}>
+        {uploadProgress > 0 && <View style={{ borderWidth: 1, width: "80%", height: 20, borderRadius: 5, marginLeft: 'auto', marginRight: "auto", marginTop: 10, }}>
+          <View style={{ backgroundColor: "green", width: `${uploadProgress}%`, height: 20 }}>
 
-             </View>
-            </View>}
+          </View>
+        </View>}
       </Modal>}
-    
+
       <Text style={{ fontSize: 20, color: "black", textAlign: "center", marginTop: 30 }}>Profile</Text>
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          right: 10,
+          top: 10,
+          borderRadius: 6,
+          borderWidth: 1,
+          padding: 10,
+          paddingTop: 5,
+          paddingBottom: 5
+        }}
+        onPress={logoutHandler}
+        >
+        <Text style={{ fontSize: 16 }}>Logout</Text>
+      </TouchableOpacity>
       <View style={style.header}>
-      
+
         <View style={style.avatar}>
           <ImageBackground
-            source={{ uri: dp?dp:"https://source.unsplash.com/100x100/?nature,mountain1" }}
-            style={[style.avatar,{overflow:"hidden"}]}
+            source={{ uri: dp ? dp : "https://source.unsplash.com/100x100/?nature,mountain1" }}
+            style={[style.avatar, { overflow: "hidden" }]}
           >
             {!dp && <FontAwesome5
               name={"user"}
@@ -117,20 +167,20 @@ const saveToFireBaseStorage=async(i:any)=>{
               style={style.ico}
             />}
           </ImageBackground>
-          <TouchableOpacity 
-          style={{
-            backgroundColor:"#000000d3",
-            borderColor:"white",
-            borderWidth:1,
-            borderRadius:7,
-            marginTop:-30,
-            marginLeft:70
-              }}
-            onPress={()=>selectImage()}  
-              >
-            <Ionicons name="add" color="white" style={{fontSize:25}}/>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#000000d3",
+              borderColor: "white",
+              borderWidth: 1,
+              borderRadius: 7,
+              marginTop: -30,
+              marginLeft: 70
+            }}
+            onPress={() => selectImage()}
+          >
+            <Ionicons name="add" color="white" style={{ fontSize: 25 }} />
 
-           
+
           </TouchableOpacity>
         </View>
 
@@ -150,7 +200,7 @@ const saveToFireBaseStorage=async(i:any)=>{
         <View style={style.follow}>
           <Text style={style.white}>10</Text>
           <Text style=
-          {style.white}>Likes</Text>
+            {style.white}>Likes</Text>
         </View>
       </View>
       <View>
@@ -160,23 +210,24 @@ const saveToFireBaseStorage=async(i:any)=>{
           <Text style={style.editProfileText}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
-<View style={{display:"flex", flexDirection:"row", flexWrap:"wrap", justifyContent:"space-evenly"}}>
-      {
-        data &&
-        data.map( (item:any, index:number)  => 
-            <View 
-            style={{ width: (screenWidth / 3)-10,
-             height: 210,
-              display: "flex",
-               alignItems: 'center',
+      <View style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
+        {
+          data &&
+          data.map((item: any, index: number) =>
+            <View
+              style={{
+                width: (screenWidth / 3) - 10,
+                height: 210,
+                display: "flex",
+                alignItems: 'center',
                 justifyContent: 'center'
-                 }}
-               key={item._data.url}  
-                 >
+              }}
+              key={item._data.url}
+            >
               <VideoPlayer
                 key={item._data.url}
                 video={{ uri: item._data.url }}
-                thumbnail={{ uri: `https://source.unsplash.com/100x100/?nature,water${index}` }}
+                thumbnail={{ uri: item._data.thumbnail }}
                 resizeMode="cover"
                 pauseOnPress={true}
                 customStyles={{ controls: false, seekBar: false }}
@@ -184,8 +235,8 @@ const saveToFireBaseStorage=async(i:any)=>{
               />
             </View>
           )}
-      </View>    
-      
+      </View>
+
 
     </ScrollView>
 
