@@ -171,10 +171,12 @@ const VideoScreen = () => {
 
             <View style={styles.box}>
               
-              <Input placeholder='Enter Title for Video'
+              <Input 
+                placeholder='Enter Title for Video'
                 style={styles.textInput}
                 value={title}
                 setValue={setTitle}
+                onSubmitEditing={()=>{saveVideoToDataBase()}}
               />
               <TouchableOpacity disabled={loading ? true : false} onPress={() => saveVideoToDataBase()}>
                 <Icon

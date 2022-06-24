@@ -6,9 +6,10 @@ type propType={
     value:string,
     placeholder:string,
     style?: StyleProp<TextStyle>,
-    secureTextEntry?:boolean
+    secureTextEntry?:boolean,
+    onSubmitEditing?:()=>void
 }
-const Input = ({setValue, value, placeholder, style, secureTextEntry}:propType) => {
+const Input = ({setValue, value, placeholder, style, secureTextEntry, onSubmitEditing}:propType) => {
   return (
     <TextInput
      placeholder={placeholder}
@@ -16,6 +17,7 @@ const Input = ({setValue, value, placeholder, style, secureTextEntry}:propType) 
      value={value}
      style={style}
      secureTextEntry={secureTextEntry}
+     onSubmitEditing={onSubmitEditing}
   />
   )
 }

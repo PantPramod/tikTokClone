@@ -8,7 +8,7 @@ type propTypes = {
     source: "Ionicons" | "FontAwesome5Icon" | "FontAwesome5",
     name: string,
     style?: StyleProp<TextStyle>,
-    color?: "black" | "white" | "#dd4557" | "rgba(255, 255, 255,1)" | "rgba(255, 255, 255 , 0.5)",
+    color?: string,
 }
 
 const Icon = ({ source, name, style, color }: propTypes) => {

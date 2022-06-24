@@ -30,6 +30,7 @@ const SearchScreen = () => {
          placeholder="Enter Image to Search"
          setValue={setSearchItem} 
          style={style.searchInput}
+         onSubmitEditing={()=>{search()}}
          />
         <TouchableOpacity
           onPress={search}

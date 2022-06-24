@@ -4,25 +4,28 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { GlobalContext } from '../../App';
 import firestore from '@react-native-firebase/firestore';
 import VideoPlayer from 'react-native-video-player';
-import {  launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/Icon';
 import TextComponent from '../components/TextComponent';
+import EditScreen from './EditScreen';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-const Profile = ({navigation}:any) => {
+const Profile = ({ navigation }: any) => {
   const [data, setData] = useState<any>([])
-  const { saveDp } = useContext(GlobalContext);
   const [image, setImage] = useState<any>(null)
   const [uploadProgress, setUploadProgress] = useState(0);
   const [emailUser, setEmailUser] = useState('');
   const [dp, setDp] = useState('')
-  const {saveEmailUser} = useContext<any>(GlobalContext)
- 
+  const [showEditProfile, setShowEditProfile] = useState(false);
+
+  const { saveDp } = useContext(GlobalContext);
+  const { saveEmailUser } = useContext<any>(GlobalContext)
+
   useEffect(() => {
     const getEmail = async () => {
       try {
@@ -30,7 +33,7 @@ const Profile = ({navigation}:any) => {
         const dp = await AsyncStorage.getItem('dp')
         if (email !== null) {
           setEmailUser(email);
-          console.log("email===>",email)
+          console.log("email===>", email)
         }
         if (dp !== null) {
           setDp(dp)
@@ -112,24 +115,24 @@ const Profile = ({navigation}:any) => {
     });
   }
 
-  const logoutHandler=async()=>{
-    
-    const res= await AsyncStorage.clear(); 
+  const logoutHandler = async () => {
+
+    const res = await AsyncStorage.clear();
     saveEmailUser('')
     setEmailUser('');
     setDp('');
     await navigation.replace('HomeScreen')
 
-    }
+  }
   return (<>
     <ScrollView style={style.container}>
       {image && <Modal>
         <TouchableOpacity onPress={() => setImage(null)}>
-       
-          <Icon 
-          name='close' 
-          style={{ fontSize: 30, textAlign: "right" }} 
-          source="Ionicons" 
+
+          <Icon
+            name='close'
+            style={{ fontSize: 30, textAlign: "right" }}
+            source="Ionicons"
           />
         </TouchableOpacity>
 
@@ -150,14 +153,14 @@ const Profile = ({navigation}:any) => {
         </View>}
       </Modal>}
 
-      
-      <TextComponent 
-        size='mediumLarge' 
+
+      <TextComponent
+        size='mediumLarge'
         color='black'
         style={{ textAlign: "center", marginTop: 30 }}
-        >
-          Profile
-          </TextComponent>
+      >
+        Profile
+      </TextComponent>
       <TouchableOpacity
         style={{
           position: "absolute",
@@ -170,7 +173,7 @@ const Profile = ({navigation}:any) => {
           paddingBottom: 5
         }}
         onPress={logoutHandler}
-        >
+      >
         <TextComponent style={{ fontSize: 16 }}>Logout</TextComponent>
       </TouchableOpacity>
       <View style={style.header}>
@@ -197,13 +200,13 @@ const Profile = ({navigation}:any) => {
             }}
             onPress={() => selectImage()}
           >
-            
-             <Icon 
-             source='Ionicons'
-             name="add"
-             style={{ fontSize: 25 }} 
-             color="white"
-             />
+
+            <Icon
+              source='Ionicons'
+              name="add"
+              style={{ fontSize: 25 }}
+              color="white"
+            />
 
           </TouchableOpacity>
         </View>
@@ -230,7 +233,7 @@ const Profile = ({navigation}:any) => {
       <View>
         <TouchableOpacity
           style={style.editProfile}
-          onPress={() => { }}>
+          onPress={() => { setShowEditProfile(true) }}>
           <TextComponent style={style.editProfileText}>Edit Profile</TextComponent>
         </TouchableOpacity>
       </View>
@@ -263,7 +266,14 @@ const Profile = ({navigation}:any) => {
 
 
     </ScrollView>
-
+    {
+      showEditProfile &&
+      <EditScreen
+        close={() => setShowEditProfile(false)}
+        dp={dp}
+        email={emailUser}
+      />
+    }
   </>
 
   )

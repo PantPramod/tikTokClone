@@ -1,13 +1,43 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Animated, Button, Text, View,  } from 'react-native';
+import { Animated, Button, Pressable, Text, View,  } from 'react-native';
 
 const FadeInView = () => {
-  const fadeAnim = useRef(new Animated.Value(0)).current  // Initial value for opacity: 0
-  
-  const [value, setValue]= useState(0)
+  const fadeAnim = useRef(new Animated.Value(1)).current;  // Initial value for opacity: 0
+  const scale = useRef(new Animated.Value(1)).current;  
+
   const startAnimation=()=>{
-    setValue(100)
-    Animated.timing(fadeAnim,{toValue: value,duration: 5000,useNativeDriver:true}).start();
+    Animated.sequence([
+      Animated.timing(fadeAnim,
+        {
+          toValue: 0.1,
+          duration: 150,
+          useNativeDriver:true
+        }),
+        
+        Animated.timing(fadeAnim,
+          {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver:true
+          })
+    ]).start()
+  
+    Animated.sequence([
+      Animated.timing(scale,
+        {
+          toValue: 0.9,
+          duration: 150,
+          useNativeDriver:true
+        }),
+        
+        Animated.timing(scale,
+          {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver:true
+          })
+    ]).start()
+
   }  
     
 
@@ -15,19 +45,25 @@ const FadeInView = () => {
 
   return (<>
     <Animated.View                 
-      style={{
+      style={[{
         width:100,
         marginLeft:"auto",
         marginRight:"auto",
         backgroundColor:"red",
-         opacity: fadeAnim,
-        transform: [{translateY:fadeAnim}]
+        opacity: fadeAnim,
+        paddingTop: 40,
+        paddingBottom:40
+        
                  
-      }}
+      },{ transform: [{ scale: scale }]}]}
+      
     >
-       <Text>Hello World</Text>
+      <Pressable onPress={startAnimation} >
+      <Text>Hello World</Text>
+      </Pressable>
+       
     </Animated.View>
-    <Button onPress={startAnimation} title="click me"/>
+    
     </>
   );
 }

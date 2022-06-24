@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import { GlobalContext } from '../../App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -9,7 +10,9 @@ import {
   StyleSheet,
   Alert,
   ImageBackground,
-  Dimensions
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -26,7 +29,6 @@ const HomeScreen = (props: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState('login');
-
   const { saveEmailUser, saveDp } = useContext(GlobalContext)
 
   const ClickHandler = async () => {
@@ -38,13 +40,14 @@ const HomeScreen = (props: any) => {
 
         await auth()
           .signInWithEmailAndPassword(email, password)
-          .then(async(data) => {
-            
-            saveEmailUser(email)
+          .then(async (data) => {
+            console.log("data===>", data.user);
+            saveEmailUser(email);
             saveDp(data.user.photoURL);
 
             await AsyncStorage.setItem('email', email)
             await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
+            await AsyncStorage.setItem('uid', data.user.uid)
             await props.navigation.navigate('MainScreen')
           })
           .catch((err) => {
@@ -53,13 +56,20 @@ const HomeScreen = (props: any) => {
       } else {
         await auth()
           .createUserWithEmailAndPassword(email, password)
-          .then(async(data) => {
+          .then(async (data) => {
             saveEmailUser(email);
-            const update = {
-              displayName: email,
-            }
-            auth().currentUser?.updateProfile(update)
-
+         
+            await firestore()
+              .collection('Users')
+              .doc(data.user.uid)
+              .set({
+                email: email,
+                password: password,
+               })
+              .then(() => {
+                console.log('User added to firestore db');
+              });
+            await AsyncStorage.setItem('uid', data.user.uid)   
             await AsyncStorage.setItem('email', email)
             await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
             await props.navigation.navigate('MainScreen')
@@ -84,7 +94,8 @@ const HomeScreen = (props: any) => {
   }
 
   return (
-    <View
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={style.container}>
       <ImageBackground
         style={style.container}
@@ -99,6 +110,7 @@ const HomeScreen = (props: any) => {
           setValue={setEmail}
           value={email}
           style={style.input}
+
         />
         <Input
           placeholder="Enter Your password"
@@ -106,11 +118,12 @@ const HomeScreen = (props: any) => {
           value={password}
           setValue={setPassword}
           secureTextEntry
+          onSubmitEditing={() => ClickHandler()}
         />
 
-        
-        <Button clickHandler={ClickHandler} style={style.btn}> 
-        {mode === "login" ?
+
+        <Button clickHandler={ClickHandler} style={style.btn}>
+          {mode === "login" ?
             <Text style={style.btnText}>Login</Text> :
             <Text style={style.btnText}>Register</Text>}
         </Button>
@@ -127,7 +140,7 @@ const HomeScreen = (props: any) => {
           </Button>
         }
       </ImageBackground>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 

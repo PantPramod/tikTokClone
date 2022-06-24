@@ -158,6 +158,7 @@ const SwipeableList = ({ navigation }: any) => {
         pagingEnabled={true}
         onScroll={scrollHandler}
         onScrollEndDrag={scrollEndHandler}
+        showsVerticalScrollIndicator={false}
       >
         {data &&
           data.map((item: any, i: number) =>
@@ -309,6 +310,7 @@ const SwipeableList = ({ navigation }: any) => {
                           style={styles.commentText}
                           value={commentText}
                           setValue={setCommentText}
+                          onSubmitEditing={()=>addComment(item.ref.id, item._data.comments)}
                         />
                         <Button
                           clickHandler={() => addComment(item.ref.id, item._data.comments)}
