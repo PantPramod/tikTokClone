@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useContext} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GlobalContext } from '../../App';
@@ -6,7 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Text,
   LogBox,
-  View,
   StyleSheet,
   Alert,
   ImageBackground,
@@ -30,7 +29,7 @@ const HomeScreen = (props: any) => {
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState('login');
   const { saveEmailUser, saveDp } = useContext(GlobalContext)
-
+  
   const ClickHandler = async () => {
     if (!email || !password) {
       Alert.alert("Entar valid email and password");
@@ -112,6 +111,7 @@ const HomeScreen = (props: any) => {
           style={style.input}
 
         />
+        
         <Input
           placeholder="Enter Your password"
           style={style.input}
@@ -166,7 +166,6 @@ const style = StyleSheet.create({
     marginRight: "auto",
     padding: 10,
     marginBottom: 30,
-
   },
   container: {
     flex: 1,

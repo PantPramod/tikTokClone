@@ -1,45 +1,50 @@
-import React, { useState } from 'react'
-import { SafeAreaView, FlatList, Image, TouchableOpacity,  View, StyleSheet,  Dimensions} from 'react-native';
+import React, { useRef, useState } from 'react'
+import { SafeAreaView, FlatList, Image, TouchableOpacity, View, StyleSheet, Dimensions, Switch, Alert, StatusBar, Animated, Modal } from 'react-native';
 import Icon from '../components/Icon';
 import Input from '../components/Input';
+import SearchImage from '../components/SearchImage';
 // @ts-ignore
 import { DATA } from '../data/data';
-
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 
 const SearchScreen = () => {
   const [showModal, setShowModal] = useState(false);
   const [imagesrc, setImageSrc] = useState('');
-  const [searchItem, setSearchItem] = useState('')
+  const [searchItem, setSearchItem] = useState('');
+
 
   const search = () => {
     setImageSrc(`https://source.unsplash.com/700x1000/?${searchItem}`)
     setShowModal(true);
+  }
 
+  const close = () => {
+    setShowModal(false);
+    setImageSrc('');
   }
   return (<>
     <SafeAreaView style={style.container}>
+
       <View style={style.searchBox}>
-        <Input 
-         value={searchItem} 
-         placeholder="Enter Image to Search"
-         setValue={setSearchItem} 
-         style={style.searchInput}
-         onSubmitEditing={()=>{search()}}
-         />
+        <Input
+          value={searchItem}
+          placeholder="Enter Image to Search"
+          setValue={setSearchItem}
+          style={style.searchInput}
+          onSubmitEditing={() => { search() }}
+        />
         <TouchableOpacity
           onPress={search}
           style={{ padding: 10 }}
         >
-          <Icon 
-          source='FontAwesome5Icon'
-          name="search" 
-          style={{ fontSize: 30 }}
-          /> 
+          <Icon
+            source='FontAwesome5Icon'
+            name="search"
+            style={{ fontSize: 30 }}
+          />
         </TouchableOpacity>
 
       </View>
+
       <FlatList
         // @ts-ignore
         data={DATA}
@@ -55,29 +60,13 @@ const SearchScreen = () => {
         </View>)}
         keyExtractor={item => item.id}
       />
-
       {showModal &&
-        <View style={style.modalWrapper}>
-          <View style={style.modal}>
-            <TouchableOpacity
-              onPress={() => { setShowModal(false); setImageSrc('') }}
-              style={{ position: "absolute", zIndex: 999, right: 10, top: 10 }}
-            >
-              <Icon 
-              name="window-close"
-              source='FontAwesome5Icon'
-              style={{ fontSize: 40, color: "white", textAlign: "right" }}
-              />
-            </TouchableOpacity>
-            <Image
-              style={{ width: windowWidth, height: windowHeight }}
-              source={{ uri: imagesrc }}
-              resizeMode="contain"
-            />
-          </View>
-
-        </View>
+        <SearchImage
+          close={close}
+          imagesrc={imagesrc}
+        />
       }
+
     </SafeAreaView>
 
   </>)
@@ -91,7 +80,7 @@ const style = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     borderColor: "black",
-    borderWidth: 1
+
   },
   modalWrapper: {
     position: "absolute",

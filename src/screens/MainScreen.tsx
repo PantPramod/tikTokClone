@@ -13,10 +13,30 @@ const Tab = createBottomTabNavigator();
 const MainScreen = () => {
   return (
     <Tab.Navigator tabBar={(props) => <MyTabBar {...props} />}>
-      <Tab.Screen name="Home" component={SwipeableList} key={1} options={{ headerShown: false }} />
-      <Tab.Screen name="Add" component={VideoScreen} key={2} options={{ headerShown: false }} />
-      <Tab.Screen name="Search" component={SearchScreen} key={3} options={{ headerShown: false }} />
-      <Tab.Screen name="Profile" component={Profile} key={4} options={{ headerShown: false }} />
+      <Tab.Screen
+        name="Home"
+        component={SwipeableList}
+        key={1}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Add"
+        component={VideoScreen}
+        key={2}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={SearchScreen}
+        key={3}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        key={4}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
 
   )

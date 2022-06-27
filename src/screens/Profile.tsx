@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Image, TouchableOpacity, View, ScrollView, StyleSheet, Dimensions, ImageBackground, Alert, Modal } from 'react-native';
+import { Image, TouchableOpacity, View, ScrollView, StyleSheet, Dimensions, ImageBackground, Alert, Modal, ActivityIndicator } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { GlobalContext } from '../../App';
 import firestore from '@react-native-firebase/firestore';
@@ -103,7 +103,9 @@ const Profile = ({ navigation }: any) => {
           photoURL: url,
         };
         await auth().currentUser?.updateProfile(update)
+        
         setImage(null);
+        setUploadProgress(0);
       }
       console.log("url====>", url)
       saveDp(url);
@@ -119,7 +121,8 @@ const Profile = ({ navigation }: any) => {
   const logoutHandler = async () => {
 
     const res = await AsyncStorage.clear();
-    saveEmailUser('')
+    
+    await saveEmailUser('')
     setEmailUser('');
     setDp('');
     await navigation.replace('HomeScreen')
@@ -219,7 +222,12 @@ const Profile = ({ navigation }: any) => {
           <TextComponent style={style.editProfileText}>Edit Profile</TextComponent>
         </TouchableOpacity>
       </View>
+      {data.length===0 && <View style={{marginTop:20}}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View> }
       <View style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
+        
+        
         {
           data &&
           data.map((item: any, index: number) =>

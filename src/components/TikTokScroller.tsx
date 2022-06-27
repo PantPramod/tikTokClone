@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Dimensions, Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Video from 'react-native-video';
 import firestore from '@react-native-firebase/firestore';
@@ -16,7 +16,18 @@ const windowHeight = Dimensions.get('window').height;
 
 const TikTokScroller = ({data, currentPage, clickHandler}: any) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    
+    const scrollViewRef = useRef<ScrollView>(null);
+   console.warn("currentpage===>",currentPage)
+    useEffect(()=>{
+      const moveScroll = (i: number) => {
+        
+        scrollViewRef.current?.scrollTo({ y: Dimensions.get('window').height * i, animated: true })
+    }
+    // setCurrentIndex(currentPage);
+      moveScroll(currentPage)
+    },[])
+
+       
     
     
     const scrollHandler = (e: any) => {
@@ -27,6 +38,7 @@ const TikTokScroller = ({data, currentPage, clickHandler}: any) => {
         <ScrollView
             pagingEnabled={true}
             onScroll={(e)=>scrollHandler(e)}
+            ref={scrollViewRef}
           >
             {data &&
                 data.map((item: any, i: number) =>

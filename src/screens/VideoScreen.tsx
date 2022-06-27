@@ -1,6 +1,6 @@
 import { useIsFocused } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, Dimensions, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Dimensions, KeyboardAvoidingView, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
@@ -10,7 +10,7 @@ import { createThumbnail } from "react-native-create-thumbnail";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/Icon';
 import Input from '../components/Input';
-
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -77,11 +77,11 @@ const VideoScreen = () => {
   }
 
   const saveVideoToDataBase = async () => {
+    setLoading(true)
     const num = new Date().toISOString();
     const reference = storage().ref(`/videos/${num}`);
     const pathToFile = `${videoUrl.path}`;
     await reference.putFile(pathToFile);
-    setLoading(true)
     const url = await storage().ref(`/videos/${num}`).getDownloadURL();
     const thumbnailofVideo = await createThumbnail({
       url: url,
@@ -136,21 +136,28 @@ const VideoScreen = () => {
           {!isrecording &&
             <View style={styles.cameraMode}>
               <TouchableOpacity onPress={() => setIsBack(!isBack)}>
-                <Icon
-                  source='FontAwesome5Icon'
-                  name="camera"
-                  color={"rgba(255, 255, 255,1)"}
+
+                <MaterialCommunityIcons
+                  color={"white"}
                   style={styles.frontback}
+                  name='camera-flip-outline'
                 />
+
               </TouchableOpacity>
             </View>
           }
 
           <View style={styles.button}>
-            {!isrecording ? <TouchableOpacity onPress={StartRecording} style={{ width: "100%" }}>
-              <Text style={styles.start}>Start</Text>
-            </TouchableOpacity> :
-              <TouchableOpacity onPress={stopRecording} style={{ width: "100%" }}>
+            {!isrecording ?
+              <TouchableOpacity
+                onPress={StartRecording}
+                style={{ width: "100%" }}>
+                <Text style={styles.start}>Start</Text>
+              </TouchableOpacity>
+              : <TouchableOpacity
+                onPress={stopRecording}
+                style={{ width: "100%" }}
+              >
                 <Text style={{ textAlign: "center", color: "red", padding: 10 }}>Stop</Text>
               </TouchableOpacity>}
           </View>
@@ -158,49 +165,59 @@ const VideoScreen = () => {
       }
       {
         showRecordedVideo &&
-        <KeyboardAvoidingView style={{ backgroundColor: "black", flex: 1, }}>
-          {!loading && <>
+        <Modal>
+          <View style={{ backgroundColor: "black", flex: 1 }}>
+            {!loading && <>
 
-            <TouchableOpacity disabled={loading ? true : false} onPress={() => setShowRecordedVideo(false)}>
-              <Icon
-                source='Ionicons'
-                name="close"
-                style={styles.close}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.box}>
-              
-              <Input 
-                placeholder='Enter Title for Video'
-                style={styles.textInput}
-                value={title}
-                setValue={setTitle}
-                onSubmitEditing={()=>{saveVideoToDataBase()}}
-              />
-              <TouchableOpacity disabled={loading ? true : false} onPress={() => saveVideoToDataBase()}>
+              <TouchableOpacity
+                disabled={loading ? true : false}
+                onPress={() => setShowRecordedVideo(false)}
+              >
                 <Icon
-                  name='save'
-                  source='FontAwesome5Icon'
-                  style={{ fontSize: 40, color: "white" }}
+                  source='Ionicons'
+                  name="close"
+                  style={styles.close}
                 />
               </TouchableOpacity>
 
-            </View>
+              <View style={styles.box}>
+                <Input
+                  placeholder='Enter Title for Video'
+                  style={styles.textInput}
+                  value={title}
+                  setValue={setTitle}
+                  onSubmitEditing={() => { saveVideoToDataBase() }}
+                />
+                <TouchableOpacity
+                  disabled={loading ? true : false}
+                  onPress={() => saveVideoToDataBase()}
+                >
+                  <Icon
+                    name='save'
+                    source='FontAwesome5Icon'
+                    style={{ fontSize: 40, color: "white" }}
+                  />
+                </TouchableOpacity>
+              </View>
 
-            <VideoPlayer
-              video={{ uri: videoUrl.path }}
-              thumbnail={{ uri: 'https://source.unsplash.com/100x100/?nature,water1' }}
-              pauseOnPress={true}
-              autoplay={true}
-              style={{ width: windowWidth, height: 400 }}
-            />
+              <VideoPlayer
+                video={{ uri: videoUrl.path }}
+                thumbnail={{ uri: 'https://source.unsplash.com/100x100/?nature,water1' }}
+                pauseOnPress={true}
+                autoplay={true}
+                style={{ width: windowWidth, height: 400 }}
+              />
+            </>
+            }
 
-          </>
-          }
-
-          {loading && <ActivityIndicator size="large" color="white" />}
-        </KeyboardAvoidingView>
+            {loading &&
+              <View style={{ height: windowHeight, justifyContent: "center" }}>
+                <ActivityIndicator
+                  size="large"
+                  color="white"
+                /></View>}
+          </View>
+        </Modal>
       }
     </>
   )
@@ -231,7 +248,7 @@ var styles = StyleSheet.create({
   },
   frontback: {
     textAlign: "center",
-    fontSize: 25
+    fontSize: 30
   },
   start: {
     textAlign: "center",

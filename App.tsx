@@ -131,7 +131,7 @@ const [item, setItem] = useState("");
       <NavigationContainer>
 
         <Stack.Navigator >
-
+ 
           {!emailUser &&
             <Stack.Screen
               name="HomeScreen"

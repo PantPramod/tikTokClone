@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Appearance, ImageBackground, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableOpacityBase, View } from 'react-native'
+import { ImageBackground, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import firestore from '@react-native-firebase/firestore';
 import Icon from '../components/Icon'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -70,11 +70,11 @@ const EditScreen = ({ close, dp, email }: propType) => {
                         source={{ uri: dp ? dp : "https://source.unsplash.com/100x100/?nature,water" }}
                         style={styles.imgStyle}
                     >
-                        <Icon
+                        {/* <Icon
                             source='Ionicons'
                             name='md-camera-outline'
                             color='rgb(243, 235, 235)'
-                            style={{ zIndex: 9, fontSize: 40, textAlign: "center" }} />
+                            style={{ zIndex: 9, fontSize: 40, textAlign: "center" }} /> */}
                     </ImageBackground>
                 </View>
                 <View>

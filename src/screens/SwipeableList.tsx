@@ -18,7 +18,8 @@ import {
   KeyboardAvoidingView,
   Modal,
   Share,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../components/Icon';
@@ -165,8 +166,6 @@ const SwipeableList = ({ navigation }: any) => {
           data.map((item: any, i: number) =>
             <View style={styles.mapWrapper} key={item._data.url}>
               <View style={styles.utills}>
-
-
                 <Avatar
                   dp={item._data.dp}
                   email={item._data.email}
