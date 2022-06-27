@@ -12,10 +12,8 @@ type propTypes = {
 }
 
 const Icon = ({ source, name, style, color }: propTypes) => {
-
     let initColor = "black";
     if (color) initColor = color;
-
     if (source === "FontAwesome5Icon")
         return (
             <FontAwesome5Icon name={name} color={initColor} style={style} />

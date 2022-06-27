@@ -8,9 +8,6 @@ import { DATA } from '../data/data';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-
-
-
 const SearchScreen = () => {
   const [showModal, setShowModal] = useState(false);
   const [imagesrc, setImageSrc] = useState('');
@@ -24,7 +21,6 @@ const SearchScreen = () => {
   return (<>
     <SafeAreaView style={style.container}>
       <View style={style.searchBox}>
-        
         <Input 
          value={searchItem} 
          placeholder="Enter Image to Search"
@@ -61,28 +57,23 @@ const SearchScreen = () => {
       />
 
       {showModal &&
-
         <View style={style.modalWrapper}>
           <View style={style.modal}>
             <TouchableOpacity
               onPress={() => { setShowModal(false); setImageSrc('') }}
               style={{ position: "absolute", zIndex: 999, right: 10, top: 10 }}
             >
-              
               <Icon 
               name="window-close"
               source='FontAwesome5Icon'
               style={{ fontSize: 40, color: "white", textAlign: "right" }}
               />
-            
             </TouchableOpacity>
-
             <Image
               style={{ width: windowWidth, height: windowHeight }}
               source={{ uri: imagesrc }}
               resizeMode="contain"
             />
-
           </View>
 
         </View>

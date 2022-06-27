@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { ImageBackground, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableOpacityBase, View } from 'react-native'
-import Button from '../components/Button'
+import { Appearance, ImageBackground, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableOpacityBase, View } from 'react-native'
 import firestore from '@react-native-firebase/firestore';
-
 import Icon from '../components/Icon'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 type propType = {
     close: () => void,
     dp: string,
     email: string
 }
+
 const EditScreen = ({ close, dp, email }: propType) => {
     const [uid, setUid] = useState('')
     const [name, setName] = useState('');
@@ -17,10 +17,10 @@ const EditScreen = ({ close, dp, email }: propType) => {
     const [insta, setInsta] = useState('');
     const [youtube, setYoutube] = useState('');
 
+   
+
     useEffect(() => {
-
         const getUid = async () => {
-
             try {
                 const uId = await AsyncStorage.getItem('uid')
                 if (uId !== null) {
@@ -77,7 +77,6 @@ const EditScreen = ({ close, dp, email }: propType) => {
                             style={{ zIndex: 9, fontSize: 40, textAlign: "center" }} />
                     </ImageBackground>
                 </View>
-                <Text style={styles.change}>Change Photo</Text>
                 <View>
                     <View style={[styles.info, { alignItems: "center" }]}>
                         <Text style={styles.infoProp}>Name</Text>
@@ -101,7 +100,6 @@ const EditScreen = ({ close, dp, email }: propType) => {
                     </View>
                     <View style={styles.info}>
                         <Text style={styles.infoProp}>Instagram</Text>
-
                         <TextInput
                             value={insta}
                             onChangeText={(text) => setInsta(text)}
@@ -116,12 +114,7 @@ const EditScreen = ({ close, dp, email }: propType) => {
                             onSubmitEditing={() => saveData({ youtube: youtube })}
                         />
                     </View>
-
-
                 </View>
-
-
-
             </ScrollView>
         </Modal>
     )
@@ -173,7 +166,6 @@ const styles = StyleSheet.create({
     infoProp: {
         fontSize: 16,
         color: "black"
-
     },
     infoValue: {
         fontSize: 16
