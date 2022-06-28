@@ -4,6 +4,11 @@ import Video from 'react-native-video';
 import firestore from '@react-native-firebase/firestore';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Avatar from './Avatar';
+import { NavigationAction, NavigationProp, useNavigation } from '@react-navigation/native';
+import Icon from './Icon';
+import Button from './Button';
+import TextComponent from './TextComponent';
 
 let statusBarHeight = 0
 if (StatusBar.currentHeight) {
@@ -17,23 +22,14 @@ const windowHeight = Dimensions.get('window').height;
 const TikTokScroller = ({data, currentPage, clickHandler}: any) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const scrollViewRef = useRef<ScrollView>(null);
-   console.warn("currentpage===>",currentPage)
-    useEffect(()=>{
-      const moveScroll = (i: number) => {
-        
-        scrollViewRef.current?.scrollTo({ y: Dimensions.get('window').height * i, animated: true })
-    }
-    // setCurrentIndex(currentPage);
-      moveScroll(currentPage)
-    },[])
+    
+    const navigation= useNavigation<any>();
 
-       
-    
-    
     const scrollHandler = (e: any) => {
-        setCurrentIndex(parseInt( ((e.nativeEvent.contentOffset.y/(windowHeight-60-statusBarHeight)).toString())))
+        setCurrentIndex(parseInt( ((e.nativeEvent.contentOffset.y/(windowHeight-statusBarHeight)).toString())))
     }
     
+  
     return (
         <ScrollView
             pagingEnabled={true}
@@ -44,31 +40,91 @@ const TikTokScroller = ({data, currentPage, clickHandler}: any) => {
                 data.map((item: any, i: number) =>
                 <View style={styles.mapWrapper} key={item._data.url}>
                    
-                    <View style={styles.utills}>
-                      <View>
-                      <TouchableOpacity onPress={()=>{clickHandler()}} style={{zIndex:999, top:10, left:10}}>
+                   <View style={styles.utills}>
+                   <TouchableOpacity onPress={()=>{clickHandler()}} style={{zIndex:999, top:10, left:10}}>
                             <Ionicons name="arrow-back" color={"white"} style={{fontSize:25}}/>
                       </TouchableOpacity>
-                      </View>
-                <TouchableOpacity 
-                style={styles.avatar}
-                onPress={()=>{clickHandler()}}>
-                 
-                  {item._data.dp &&
-                  <Image source={{uri:item._data.dp}}
-                  style={{zIndex:999, width:50, height:50, borderRadius:50}}
-                  />}
-                  {!item._data.dp &&
-                  <Text style={[styles.avatarText, { fontSize: 25 }]}>{item._data.email[0]}</Text>
-                  }
-                </TouchableOpacity>
-                
+                <Avatar
+                  dp={item._data.dp}
+                  email={item._data.email}
+                  style={styles.avatar}
+                  clickHandler={() => { }}
+                />
+
+                <View style={{ width: 50, height: 50, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", marginLeft: "auto", marginRight: 10, marginTop: -45, }}>
+
+                  <TouchableOpacity style={{ borderRadius: 50, backgroundColor: "#ea4359" }}>
+                    <Icon
+                      source='Ionicons'
+                      name="add"
+                      style={{ fontSize: 20, zIndex: 999 }}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+
+                </View>
+                <View style={styles.alignment}>
+                  <Button clickHandler={() => { 
+                    // increaseLkes(item.ref.id, item._data.likes) 
+                    }}>
+                    <Icon
+                      source='Ionicons'
+                      name={
+                        // item._data.likes.indexOf(emailUser) === -1 ?
+                          // "md-heart-outline" :
+                          "heart"
+                      }
+                      color={
+                        // item._data.likes.indexOf(emailUser) === -1 ?
+                          // "white" :
+                          "#dd4557"
+                      }
+                      style={{ fontSize: 40 }}
+                    />
+                  </Button>
+                  <TextComponent style={styles.center}>{item._data.likes.length}</TextComponent>
+                </View>
+
+                <View style={styles.alignment}>
+                  <Button clickHandler={() =>{ 
+                    // setShowComments(true)}
+                    }}>
+                    <Icon
+                      name="comment-dots"
+                      source='FontAwesome5Icon'
+                      color='white'
+                      style={{ fontSize: 40 }}
+                    />
+                  </Button>
+                  <TextComponent style={styles.center}>{item._data.comments.length}</TextComponent>
+                </View>
+
+                <View style={styles.alignment}>
+                  <Button clickHandler={() =>{ 
+                    // onShare(item._data.url)}
+                  }}
+                    >
+                    <Icon
+                      source='FontAwesome5Icon'
+                      name="share"
+                      color='white'
+                      style={{ fontSize: 40 }}
+                    />
+                  </Button>
+                  <TextComponent style={styles.center}>Share</TextComponent>
+                </View>
+
                 <View style={styles.username}>
-                  <Text style={styles.usernameText}>@{item._data.email.substring(0, item._data.email.indexOf("@"))}</Text>
+                  <TextComponent
+                    style={styles.usernameText}>
+                    {`@${item._data.email.substring(0, item._data.email.indexOf("@"))}`}
+                  </TextComponent>
                 </View>
+
                 <View style={styles.title}>
-                  <Text style={styles.titleText}>#{item._data.title}</Text>
+                  <TextComponent style={styles.titleText}>{`#${item._data.title}`}</TextComponent>
                 </View>
+
               </View> 
                     {i===currentIndex && 
                     <Video

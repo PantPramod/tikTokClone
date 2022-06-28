@@ -34,8 +34,6 @@ const VideoScreen = () => {
 
   const isAppForeground = useIsFocused()
 
-  // const {  dp } = useContext(GlobalContext)
-
 
   useEffect(() => {
     const permission = async () => {
@@ -54,7 +52,7 @@ const VideoScreen = () => {
           setDp(dp);
         }
       } catch (e) {
-        // error reading value
+
       }
     }
     getEmail();
@@ -92,7 +90,6 @@ const VideoScreen = () => {
     const imagePathToFile = `${thumbnailofVideo.path}`;
     await imageReference.putFile(imagePathToFile);
     const urlImage = await storage().ref(`/images/${num}`).getDownloadURL();
-    console.log("thumbnailofVideo=====>", urlImage)
 
     await firestore()
       .collection('UserData')
@@ -110,14 +107,12 @@ const VideoScreen = () => {
         setLoading(false)
       });
 
-    console.log("Url====>", url)
-
   }
 
 
 
 
-  if (device == null) return <View ><Text>Loading</Text></View>
+  if (device == null) return <View ><Text>Loading...</Text></View>
 
   return (
     <>
@@ -158,7 +153,7 @@ const VideoScreen = () => {
                 onPress={stopRecording}
                 style={{ width: "100%" }}
               >
-                <Text style={{ textAlign: "center", color: "red", padding: 10 }}>Stop</Text>
+                <Text style={styles.stop}>Stop</Text>
               </TouchableOpacity>}
           </View>
         </>
@@ -166,7 +161,7 @@ const VideoScreen = () => {
       {
         showRecordedVideo &&
         <Modal>
-          <View style={{ backgroundColor: "black", flex: 1 }}>
+          <View style={styles.bg}>
             {!loading && <>
 
               <TouchableOpacity
@@ -205,7 +200,7 @@ const VideoScreen = () => {
                 thumbnail={{ uri: 'https://source.unsplash.com/100x100/?nature,water1' }}
                 pauseOnPress={true}
                 autoplay={true}
-                style={{ width: windowWidth, height: 400 }}
+                style={styles.vdo}
               />
             </>
             }
@@ -255,6 +250,11 @@ var styles = StyleSheet.create({
     color: "white",
     padding: 10
   },
+  stop: {
+    textAlign: "center",
+    color: "red",
+    padding: 10
+  },
   close: {
     fontSize: 40,
     color: "white",
@@ -273,6 +273,14 @@ var styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     paddingBottom: 20
+  },
+  vdo: {
+    width: windowWidth,
+    height: 400
+  },
+  bg: {
+    backgroundColor: "black",
+    flex: 1
   }
 });
 

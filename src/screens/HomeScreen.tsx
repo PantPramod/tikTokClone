@@ -1,4 +1,4 @@
-import React, { useState, useContext} from 'react';
+import React, { useState, useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { GlobalContext } from '../../App';
@@ -11,11 +11,19 @@ import {
   ImageBackground,
   Dimensions,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  View,
+  TextInput,
+  TouchableOpacity
 } from 'react-native';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { useForm, Controller } from 'react-hook-form';
 
+type dataType = {
+  email: string,
+  password: string
+}
 
 const windowHeight = Dimensions.get('screen').height
 
@@ -25,72 +33,93 @@ LogBox.ignoreLogs([
 
 const HomeScreen = (props: any) => {
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [mode, setMode] = useState('login');
   const { saveEmailUser, saveDp } = useContext(GlobalContext)
-  
-  const ClickHandler = async () => {
-    if (!email || !password) {
-      Alert.alert("Entar valid email and password");
+  const { register, setValue, handleSubmit, control, reset,setError, formState: { errors } } = useForm({
+    defaultValues: {
+      email: '',
+      password: ''
     }
-    else {
-      if (mode === "login") {
+  });
+  const onSubmit = (data: dataType) => {
+    console.log(data);
+    ClickHandler(data.email, data.password);
+  };
 
-        await auth()
-          .signInWithEmailAndPassword(email, password)
-          .then(async (data) => {
-            console.log("data===>", data.user);
-            saveEmailUser(email);
-            saveDp(data.user.photoURL);
+ 
+  console.log('errors', errors);
 
-            await AsyncStorage.setItem('email', email)
-            await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
-            await AsyncStorage.setItem('uid', data.user.uid)
-            await props.navigation.navigate('MainScreen')
-          })
-          .catch((err) => {
-            console.log("err code---->", err.code)
-          })
-      } else {
-        await auth()
-          .createUserWithEmailAndPassword(email, password)
-          .then(async (data) => {
-            saveEmailUser(email);
-         
-            await firestore()
-              .collection('Users')
-              .doc(data.user.uid)
-              .set({
-                email: email,
-                password: password,
-               })
-              .then(() => {
-                console.log('User added to firestore db');
-              });
-            await AsyncStorage.setItem('uid', data.user.uid)   
-            await AsyncStorage.setItem('email', email)
-            await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
-            await props.navigation.navigate('MainScreen')
+  const ClickHandler = async (email: string, password: string) => {
+ 
+    if (mode === "login") {
 
+      await auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(async (data) => {
+          console.log("data===>", data.user);
+          saveEmailUser(email);
+          saveDp(data.user.photoURL);
+
+          await AsyncStorage.setItem('email', email)
+          await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
+          await AsyncStorage.setItem('uid', data.user.uid)
+          await reset({
+            email: '',
+            password: ''
           })
-          .catch(error => {
-            console.log("error==>", error)
-          });
-      }
+          await props.navigation.navigate('MainScreen')
+        })
+        .catch((err) => {
+          console.log("err code---->", err.code)
+          setError('email', { type: 'server', message: 'Wrong Email' });
+          setError('password', { type: 'server', message: 'Wrong Password' });
+          
+        })
+    } else {
+      await auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(async (data) => {
+          saveEmailUser(email);
+
+          await firestore()
+            .collection('Users')
+            .doc(data.user.uid)
+            .set({
+              email: email,
+              password: password,
+            })
+            .then(() => {
+              console.log('User added to firestore db');
+            });
+          await AsyncStorage.setItem('uid', data.user.uid)
+          await AsyncStorage.setItem('email', email)
+          await AsyncStorage.setItem('dp', data.user.photoURL ? data.user.photoURL : '')
+          await reset({
+            email: '',
+            password: ''
+          })
+          await props.navigation.navigate('MainScreen')
+
+        })
+        .catch(error => {
+          console.log("error==>", error)
+          setError('email', { type: 'server', message: 'Authentication failed' });
+          setError('password', { type: 'server', message: 'Authentication failed' });
+ 
+    
+        });
     }
   }
 
   const changeModeToRegister = () => {
     setMode("register");
-    setEmail('');
-    setPassword('');
+ 
   }
   const changeModeToLogin = () => {
     setMode("login");
-    setEmail('');
-    setPassword('');
   }
+
+ 
 
   return (
     <KeyboardAvoidingView
@@ -104,25 +133,50 @@ const HomeScreen = (props: any) => {
           <Text style={style.header}>Registeration Form</Text>
         }
 
-        <Input
-          placeholder='Enter Your Email'
-          setValue={setEmail}
-          value={email}
-          style={style.input}
 
+
+        {errors.email?.type==="required" && <Text style={{ color: "red", paddingLeft:20, paddingBottom:10}}>Email is required.</Text>}
+        {errors.email?.type==="server" && <Text style={{ color: "red", paddingLeft:20, paddingBottom:10}}>{errors.email.message}</Text>}
+    
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder='Enter Your Email'
+              setValue={value => onChange(value)}
+              value={value}
+              style={style.input}
+            />
+          )}
+          name="email"
+          rules={{ required: true }}
         />
         
-        <Input
-          placeholder="Enter Your password"
-          style={style.input}
-          value={password}
-          setValue={setPassword}
-          secureTextEntry
-          onSubmitEditing={() => ClickHandler()}
+        {errors.password?.type==="required" && <Text style={{ color: "red" , paddingLeft:20, paddingBottom:10}}>Password is required.</Text>}
+        {errors.password?.type==="server" && <Text style={{ color: "red", paddingLeft:20, paddingBottom:10}}>{errors.password.message}</Text>}
+    
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Enter Your password"
+              style={style.input}
+              value={value}
+              setValue={value => onChange(value)}
+              secureTextEntry
+              onSubmitEditing={handleSubmit(onSubmit)}
+            />
+          )}
+          name="password"
+          rules={{ required: true }}
         />
+       
 
 
-        <Button clickHandler={ClickHandler} style={style.btn}>
+
+
+
+        <Button clickHandler={handleSubmit(onSubmit)} style={style.btn}>
           {mode === "login" ?
             <Text style={style.btnText}>Login</Text> :
             <Text style={style.btnText}>Register</Text>}

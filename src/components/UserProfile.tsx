@@ -22,7 +22,12 @@ const UserProfile = ({ route, navigation }: any) => {
     getData();
   },[])
 
-
+  const rotateArray=(a:[], n:number)=>{
+    let el= a.splice(n,1);
+    console.log(el);  
+    return [...el ,...a]
+    
+  }
 
   return (<>{!showVideos &&
     <>
@@ -86,7 +91,7 @@ const UserProfile = ({ route, navigation }: any) => {
     </>
   }
     {showVideos &&
-      <TikTokScroller data={data} currentPage={currentPage} clickHandler={()=>setShowVideos(false)}/>
+      <TikTokScroller data={rotateArray(data, currentPage) } currentPage={currentPage} clickHandler={()=>setShowVideos(false)}/>
     }
   </>
   )

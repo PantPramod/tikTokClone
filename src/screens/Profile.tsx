@@ -103,7 +103,7 @@ const Profile = ({ navigation }: any) => {
           photoURL: url,
         };
         await auth().currentUser?.updateProfile(update)
-        
+
         setImage(null);
         setUploadProgress(0);
       }
@@ -121,7 +121,7 @@ const Profile = ({ navigation }: any) => {
   const logoutHandler = async () => {
 
     const res = await AsyncStorage.clear();
-    
+
     await saveEmailUser('')
     setEmailUser('');
     setDp('');
@@ -147,16 +147,7 @@ const Profile = ({ navigation }: any) => {
         Profile
       </TextComponent>
       <TouchableOpacity
-        style={{
-          position: "absolute",
-          right: 10,
-          top: 10,
-          borderRadius: 6,
-          borderWidth: 1,
-          padding: 10,
-          paddingTop: 5,
-          paddingBottom: 5
-        }}
+        style={style.logout}
         onPress={logoutHandler}
       >
         <TextComponent style={{ fontSize: 16 }}>Logout</TextComponent>
@@ -222,12 +213,14 @@ const Profile = ({ navigation }: any) => {
           <TextComponent style={style.editProfileText}>Edit Profile</TextComponent>
         </TouchableOpacity>
       </View>
-      {data.length===0 && <View style={{marginTop:20}}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View> }
-      <View style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly" }}>
-        
-        
+      {data.length === 0 &&
+        <View style={{ marginTop: 20 }}>
+          <ActivityIndicator
+            size="large"
+            color="#0000ff"
+          />
+        </View>}
+      <View style={style.all}>
         {
           data &&
           data.map((item: any, index: number) =>
@@ -316,7 +309,6 @@ const style = StyleSheet.create({
     flexDirection: "row",
     width: "90%",
     textAlign: "center"
-
   },
 
   follow: {
@@ -343,5 +335,21 @@ const style = StyleSheet.create({
   editProfileText: {
     color: "black",
     textAlign: "center"
+  },
+  logout: {
+    position: "absolute",
+    right: 10,
+    top: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    padding: 10,
+    paddingTop: 5,
+    paddingBottom: 5
+  },
+  all: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-evenly"
   }
 })

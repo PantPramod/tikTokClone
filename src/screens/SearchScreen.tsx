@@ -50,7 +50,8 @@ const SearchScreen = () => {
         data={DATA}
         horizontal={false}
         numColumns={3}
-        renderItem={({ item }) => (<View style={{ width: "33.33%", height: 100 }}>
+        renderItem={({ item }) => (
+        <View style={style.img}>
           <TouchableOpacity onPress={() => { setShowModal(true); setImageSrc(item.src + item.id) }}>
             <Image
               style={{ width: "100%", height: 100 }}
@@ -115,5 +116,9 @@ const style = StyleSheet.create({
     flex: 1,
     padding: 10,
     fontSize: 20
+  },
+  img:{ 
+    width: "33.33%", 
+    height: 100 
   }
 })
